@@ -1,11 +1,7 @@
-iPhone APKG Web App
+iPhone APKG Web App - FIXED
 
-1) Upload this folder to any static host (GitHub Pages, Cloudflare Pages, Netlify, Vercel, etc.).
-2) Open the HTTPS address in Safari on iPhone.
-3) Choose your .apkg file.
-4) Safari > Share > Add to Home Screen.
+This version supports both:
+- older APKG media index (JSON)
+- newer Anki APKG packages that use Zstandard-compressed protobuf media metadata/files
 
-Important:
-- APKG is processed locally in the browser.
-- This first version reads collection.anki2, which is the compatibility database included in many modern APKG packages.
-- Internet is needed on first load for JSZip/sql.js libraries.
+Upload index.html and manifest.webmanifest to the root of your GitHub Pages repository.
