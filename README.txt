@@ -1,13 +1,11 @@
-v5.1: iPhone file picker fix. Removed the HTML accept filter so .apkg files are selectable in iOS Files.
+Flashcard WebApp v5.2
 
-Flashcard WebApp v5
-
-Library-based version:
-- Add multiple APKG files; previous decks are not replaced.
-- Each APKG becomes a separate collection in the library.
-- Each collection keeps its own lessons, audio, progress, Good/Again states and last position.
-- APKG blobs and parsed cards/media indexes are stored locally in IndexedDB.
-- Designed for iPhone / Add to Home Screen.
-- Modern Anki collection.anki21b and Zstandard packages supported.
-
-Replace index.html, manifest.webmanifest and README.txt in the GitHub Pages repository.
+Changes:
+- Exact app title: فلش‌کارت‌های سمانه 🌸
+- Swipe RIGHT = next flashcard.
+- Swipe LEFT = previous flashcard.
+- Previous/Next buttons added as an alternative to swipe.
+- Browsing stays inside the currently selected lesson/deck.
+- Swipe/navigation does not mark a card Good or Again.
+- Current position is saved.
+- All v5.1 library, multi-APKG, iPhone file-picker, audio and progress features remain.

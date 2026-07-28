@@ -33,7 +33,7 @@ input[type=file]{display:none}
 .stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;align-items:center;gap:10px}
 select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #344562;border-radius:14px;padding:12px;font-size:15px}
 .progress{height:7px;background:#26324a;border-radius:99px;overflow:hidden;margin:10px 0 16px}.progress div{height:100%;background:var(--accent)}
-.studyCard{background:#fff;color:#111827;border-radius:24px;min-height:350px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.studyCard{background:#fff;color:#111827;touch-action:pan-y;user-select:none;transition:transform .16s ease,opacity .16s ease;border-radius:24px;min-height:350px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .front{font-size:25px;line-height:1.8;white-space:pre-wrap}.answer{display:none;border-top:1px solid #ddd;margin-top:24px;padding-top:22px;width:100%;font-size:23px;line-height:1.7;direction:ltr;white-space:pre-wrap}
 .audio{width:100%;margin-top:15px}.audio audio{width:100%}
 .row{display:flex;gap:10px;margin-top:10px}.row .btn{flex:1}
@@ -45,7 +45,7 @@ select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های من</h1><div class="sub">کتابخانه شخصی · v5.1</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · v5.2</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -76,6 +76,10 @@ select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #
     <div class="front" id="front"></div>
     <div class="answer" id="answer"></div>
     <div class="audio" id="audio"></div>
+   </div>
+   <div class="row navrow">
+     <button id="nextCard" class="btn secondary">کارت بعدی ➡️</button>
+     <button id="prevCard" class="btn secondary">⬅️ کارت قبلی</button>
    </div>
    <div class="row"><button id="show" class="btn secondary">نمایش جواب</button></div>
    <div class="row"><button id="again" class="btn secondary">دوباره</button><button id="good" class="btn primary">بلدم ✓</button></div>
@@ -176,6 +180,45 @@ $("#file").onchange=e=>{
 };
 $("#back").onclick=async()=>{$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
 $("#lessonSelect").onchange=async()=>{current.selected=$("#lessonSelect").value;apply();await persist();render()};
+
+async function browseCard(delta){
+  if(!filtered.length)return;
+  idx=(idx+delta+filtered.length)%filtered.length;
+  let v=$("#lessonSelect").value;
+  current.positions[v]=idx;
+  await persist();
+  render();
+}
+$("#nextCard").onclick=()=>browseCard(1);
+$("#prevCard").onclick=()=>browseCard(-1);
+
+// Requested direction:
+// swipe RIGHT = next card, swipe LEFT = previous card.
+// Vertical scrolling remains available.
+let swipeX=0, swipeY=0, swiping=false;
+const studyCard=$("#front").closest(".studyCard");
+studyCard.addEventListener("touchstart",e=>{
+  if(e.touches.length!==1)return;
+  swipeX=e.touches[0].clientX;
+  swipeY=e.touches[0].clientY;
+  swiping=true;
+},{passive:true});
+studyCard.addEventListener("touchend",e=>{
+  if(!swiping || !e.changedTouches.length)return;
+  swiping=false;
+  const dx=e.changedTouches[0].clientX-swipeX;
+  const dy=e.changedTouches[0].clientY-swipeY;
+  if(Math.abs(dx)<55 || Math.abs(dx)<=Math.abs(dy)*1.15)return;
+  studyCard.style.transform=`translateX(${dx>0?18:-18}px)`;
+  studyCard.style.opacity=".82";
+  setTimeout(()=>{
+    studyCard.style.transform="";
+    studyCard.style.opacity="";
+    // Right => next; Left => previous.
+    browseCard(dx>0?1:-1);
+  },120);
+});
+
 $("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none"};
 $("#good").onclick=()=>mark("good");$("#again").onclick=()=>mark("again");
 renderLibrary();
