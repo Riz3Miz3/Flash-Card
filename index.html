@@ -40,12 +40,97 @@ select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #
 .summary{display:flex;gap:8px;margin:8px 0}.pill{flex:1;background:#19243c;border-radius:12px;padding:8px;text-align:center;color:var(--muted);font-size:11px}.pill strong{display:block;color:#fff;font-size:16px}
 #toast{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 18px);left:50%;transform:translateX(-50%);background:#17223b;border:1px solid #33425f;border-radius:14px;padding:11px 16px;display:none;z-index:99;max-width:90%;text-align:center}
 #status{margin-top:12px;color:var(--muted);line-height:1.7}
+
+/* v5.3 — iPhone full-screen study mode */
+body.studying{overflow:hidden;height:100dvh}
+body.studying .wrap{
+  height:100dvh;
+  max-height:100dvh;
+  padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+body.studying header{display:none}
+body.studying #studyView{
+  display:flex!important;
+  flex-direction:column;
+  height:100%;
+  min-height:0;
+}
+body.studying .back{
+  flex:0 0 auto;
+  margin:0 0 6px;
+  padding:8px 11px;
+  font-size:12px;
+  border-radius:11px;
+  align-self:flex-start;
+}
+body.studying #studyView>.panel{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:10px;
+  border-radius:18px;
+  overflow:hidden;
+}
+body.studying .stats{font-size:11px;min-height:18px}
+body.studying select{
+  flex:0 0 auto;
+  margin:5px 0;
+  padding:8px 10px;
+  min-height:34px;
+  border-radius:11px;
+  font-size:13px;
+}
+body.studying .summary{margin:3px 0;gap:5px}
+body.studying .pill{padding:5px 4px;font-size:9px;border-radius:9px}
+body.studying .pill strong{font-size:13px}
+body.studying .progress{height:5px;margin:4px 0 7px}
+body.studying .studyCard{
+  flex:1 1 auto;
+  min-height:0;
+  height:auto;
+  padding:12px 12px;
+  border-radius:18px;
+  overflow:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  -webkit-user-select:none;
+  user-select:none;
+  will-change:transform,opacity;
+}
+body.studying .front{font-size:clamp(18px,2.8vh,24px);line-height:1.55}
+body.studying .answer{
+  font-size:clamp(17px,2.5vh,22px);
+  line-height:1.5;
+  margin-top:12px;
+  padding-top:12px;
+}
+body.studying .audio{margin-top:8px}
+body.studying .audio audio{height:34px}
+body.studying .row{flex:0 0 auto;gap:6px;margin-top:6px}
+body.studying .row .btn{
+  padding:8px 8px;
+  border-radius:10px;
+  font-size:12px;
+  min-height:34px;
+}
+@media (max-height:700px){
+  body.studying .summary{display:none}
+  body.studying .front{font-size:18px}
+  body.studying .answer{font-size:17px}
+  body.studying .row .btn{min-height:31px;padding:6px 7px}
+  body.studying .back{padding:6px 9px}
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · v5.2</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · v5.3</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -152,7 +237,7 @@ async function renderLibrary(){
 async function openDeck(id){
  let libs=await library();current=libs.find(x=>x.id===id);if(!current)return;
  let blob=await get("blob:"+id);current.cards=await get("cards:"+id);mediaMap=await get("media:"+id)||{};zip=await JSZip.loadAsync(blob);
- $("#libraryView").style.display="none";$("#studyView").style.display="block";$("#studyTitle").textContent=current.title;
+ document.body.classList.add("studying");$("#libraryView").style.display="none";$("#studyView").style.display="flex";$("#studyTitle").textContent=current.title;
  let ids=[...new Set(current.cards.map(c=>c.did))].sort((a,b)=>shortName(current.decks[a]).localeCompare(shortName(current.decks[b]),"fr",{numeric:true}));
  $("#lessonSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+ids.map(x=>`<option value="${x}">${shortName(current.decks[x])}</option>`).join("");
  $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();render();
@@ -178,7 +263,7 @@ $("#file").onchange=e=>{
     e.target.value="";
   }
 };
-$("#back").onclick=async()=>{$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
+$("#back").onclick=async()=>{document.body.classList.remove("studying");$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
 $("#lessonSelect").onchange=async()=>{current.selected=$("#lessonSelect").value;apply();await persist();render()};
 
 async function browseCard(delta){
@@ -192,32 +277,66 @@ async function browseCard(delta){
 $("#nextCard").onclick=()=>browseCard(1);
 $("#prevCard").onclick=()=>browseCard(-1);
 
-// Requested direction:
-// swipe RIGHT = next card, swipe LEFT = previous card.
-// Vertical scrolling remains available.
-let swipeX=0, swipeY=0, swiping=false;
+// v5.3 native-like swipe using Pointer Events.
+// RIGHT = next card, LEFT = previous card.
 const studyCard=$("#front").closest(".studyCard");
-studyCard.addEventListener("touchstart",e=>{
-  if(e.touches.length!==1)return;
-  swipeX=e.touches[0].clientX;
-  swipeY=e.touches[0].clientY;
-  swiping=true;
-},{passive:true});
-studyCard.addEventListener("touchend",e=>{
-  if(!swiping || !e.changedTouches.length)return;
-  swiping=false;
-  const dx=e.changedTouches[0].clientX-swipeX;
-  const dy=e.changedTouches[0].clientY-swipeY;
-  if(Math.abs(dx)<55 || Math.abs(dx)<=Math.abs(dy)*1.15)return;
-  studyCard.style.transform=`translateX(${dx>0?18:-18}px)`;
-  studyCard.style.opacity=".82";
-  setTimeout(()=>{
+let dragStartX=0, dragStartY=0, dragX=0, dragging=false, horizontalDrag=false;
+
+studyCard.addEventListener("pointerdown", e=>{
+  if(e.pointerType==="mouse" && e.button!==0)return;
+  dragStartX=e.clientX; dragStartY=e.clientY; dragX=0;
+  dragging=true; horizontalDrag=false;
+  try{studyCard.setPointerCapture(e.pointerId)}catch(_){}
+});
+
+studyCard.addEventListener("pointermove", e=>{
+  if(!dragging)return;
+  const dx=e.clientX-dragStartX;
+  const dy=e.clientY-dragStartY;
+
+  if(!horizontalDrag){
+    if(Math.abs(dx)<8 && Math.abs(dy)<8)return;
+    if(Math.abs(dx)>Math.abs(dy)*1.08) horizontalDrag=true;
+    else { dragging=false; return; }
+  }
+
+  dragX=dx;
+  if(e.cancelable)e.preventDefault();
+  const limited=Math.max(-110,Math.min(110,dx));
+  studyCard.style.transition="none";
+  studyCard.style.transform=`translateX(${limited}px) rotate(${limited/45}deg)`;
+  studyCard.style.opacity=String(Math.max(.72,1-Math.abs(limited)/420));
+}, {passive:false});
+
+async function finishSwipe(e){
+  if(!dragging)return;
+  dragging=false;
+  try{studyCard.releasePointerCapture(e.pointerId)}catch(_){}
+  const shouldMove=horizontalDrag && Math.abs(dragX)>=48;
+  studyCard.style.transition="transform .16s ease,opacity .16s ease";
+
+  if(shouldMove){
+    const dir=dragX>0?1:-1; // right next, left previous
+    studyCard.style.transform=`translateX(${dragX>0?140:-140}px)`;
+    studyCard.style.opacity=".25";
+    setTimeout(async()=>{
+      await browseCard(dir);
+      studyCard.style.transition="none";
+      studyCard.style.transform=`translateX(${dragX>0?-32:32}px)`;
+      studyCard.style.opacity=".55";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        studyCard.style.transition="transform .16s ease,opacity .16s ease";
+        studyCard.style.transform="";
+        studyCard.style.opacity="";
+      }));
+    },120);
+  }else{
     studyCard.style.transform="";
     studyCard.style.opacity="";
-    // Right => next; Left => previous.
-    browseCard(dx>0?1:-1);
-  },120);
-});
+  }
+}
+studyCard.addEventListener("pointerup",finishSwipe);
+studyCard.addEventListener("pointercancel",finishSwipe);
 
 $("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none"};
 $("#good").onclick=()=>mark("good");$("#again").onclick=()=>mark("again");

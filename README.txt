@@ -1,11 +1,14 @@
-Flashcard WebApp v5.2
+Flashcard WebApp v5.3
 
 Changes:
-- Exact app title: فلش‌کارت‌های سمانه 🌸
-- Swipe RIGHT = next flashcard.
-- Swipe LEFT = previous flashcard.
-- Previous/Next buttons added as an alternative to swipe.
-- Browsing stays inside the currently selected lesson/deck.
-- Swipe/navigation does not mark a card Good or Again.
-- Current position is saved.
-- All v5.1 library, multi-APKG, iPhone file-picker, audio and progress features remain.
+- iPhone study screen fits inside one 100dvh viewport.
+- Page itself no longer needs vertical scrolling while studying.
+- Header is hidden in Study mode to save space.
+- Card area dynamically uses the remaining screen height.
+- On very small iPhones, secondary stats compact automatically.
+- Real-time Pointer Events swipe:
+  RIGHT = next card
+  LEFT = previous card
+- Card follows the finger and animates between cards.
+- Vertical gestures still work for card content when needed.
+- Existing library, multi-APKG, audio, progress, Good/Again, and iPhone file-picker features remain.
