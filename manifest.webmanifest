@@ -1,9 +1,9 @@
 {
-  "name":"فلش‌کارت من",
+  "name":"فلش‌کارت‌های من",
   "short_name":"فلش‌کارت",
   "start_url":"./",
   "display":"standalone",
-  "background_color":"#0b1020",
-  "theme_color":"#111827",
+  "background_color":"#080e1c",
+  "theme_color":"#0a1020",
   "icons":[]
 }

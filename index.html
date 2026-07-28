@@ -1,288 +1,173 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#111827">
-  <title>فلش‌کارت من</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <style>
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;background:#0b1020;color:#fff;min-height:100vh}
-    .wrap{max-width:720px;margin:auto;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 24px)}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-    h1{font-size:22px;margin:0}.muted{color:#9ca3af;font-size:13px}
-    .panel{background:#121a2d;border:1px solid #25304a;border-radius:22px;padding:18px;box-shadow:0 12px 40px #0005}
-    .drop{border:2px dashed #405071;border-radius:18px;padding:28px 16px;text-align:center}
-    input[type=file]{display:none}
-    .btn{border:0;border-radius:14px;padding:13px 16px;font-size:16px;font-weight:700;cursor:pointer}
-    .primary{background:#fbbf24;color:#111827}.secondary{background:#202b44;color:#fff}.danger{background:#3b1d27;color:#fecdd3}
-    .row{display:flex;gap:10px;flex-wrap:wrap}.row .btn{flex:1}
-    #study{display:none}
-    .progress{height:7px;background:#263149;border-radius:99px;overflow:hidden;margin:14px 0 18px}
-    #bar{height:100%;width:0;background:#fbbf24}
-    .card{min-height:330px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:28px 18px;background:#fff;color:#111827;border-radius:24px}
-    .front{font-size:25px;line-height:1.8;white-space:pre-wrap}
-    .answer{display:none;margin-top:24px;padding-top:22px;border-top:1px solid #ddd;width:100%;font-size:23px;line-height:1.7;direction:ltr;white-space:pre-wrap}
-    .audio{margin-top:16px;width:100%}.audio audio{width:100%}
-    .stats{display:flex;justify-content:space-between;color:#aab3c5;font-size:13px;margin-bottom:10px}
-    #status{margin-top:14px;line-height:1.8}.ok{color:#86efac}.err{color:#fda4af}
-    .tiny{font-size:12px;color:#8d99ae;margin-top:14px}
-    select{width:100%;background:#202b44;color:#fff;border:1px solid #33415e;border-radius:14px;padding:12px;margin:12px 0;font-size:15px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a1020">
+<title>فلش‌کارت من</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#080e1c;--panel:#111a2e;--panel2:#17223b;--line:#263653;--text:#f8fafc;--muted:#94a3b8;--accent:#fbbf24;--danger:#4a2029}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:calc(env(safe-area-inset-top) + 18px) 14px calc(env(safe-area-inset-bottom) + 28px)}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+h1{font-size:24px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:4px}.btn{border:0;border-radius:14px;padding:12px 15px;font-weight:800;font-size:14px;cursor:pointer}
+.primary{background:var(--accent);color:#111827}.secondary{background:#202c47;color:#fff}.danger{background:var(--danger);color:#fecdd3}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:0 16px 45px #0004}
+input[type=file]{display:none}
+#libraryEmpty{text-align:center;padding:40px 16px}.emptyIcon{font-size:50px;margin-bottom:8px}
+.libraryHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.libraryHead h2{margin:0;font-size:20px}
+.deckGrid{display:grid;grid-template-columns:1fr;gap:12px}
+.deckCard{background:linear-gradient(145deg,#17223b,#111a2e);border:1px solid #293957;border-radius:20px;padding:16px;cursor:pointer;position:relative;overflow:hidden}
+.deckCard:active{transform:scale(.99)}
+.deckTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.deckTitle{font-size:18px;font-weight:850;line-height:1.45}.deckMeta{font-size:12px;color:var(--muted);margin-top:5px}
+.ring{min-width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#202c47;font-size:12px;font-weight:800;border:4px solid #31415f}
+.miniProgress{height:6px;background:#26324a;border-radius:99px;overflow:hidden;margin-top:14px}.miniProgress>div{height:100%;background:var(--accent)}
+.cardActions{display:flex;gap:8px;margin-top:12px}.cardActions button{flex:1}
+#studyView{display:none}.back{margin-bottom:12px}
+.stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;align-items:center;gap:10px}
+select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #344562;border-radius:14px;padding:12px;font-size:15px}
+.progress{height:7px;background:#26324a;border-radius:99px;overflow:hidden;margin:10px 0 16px}.progress div{height:100%;background:var(--accent)}
+.studyCard{background:#fff;color:#111827;border-radius:24px;min-height:350px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.front{font-size:25px;line-height:1.8;white-space:pre-wrap}.answer{display:none;border-top:1px solid #ddd;margin-top:24px;padding-top:22px;width:100%;font-size:23px;line-height:1.7;direction:ltr;white-space:pre-wrap}
+.audio{width:100%;margin-top:15px}.audio audio{width:100%}
+.row{display:flex;gap:10px;margin-top:10px}.row .btn{flex:1}
+.summary{display:flex;gap:8px;margin:8px 0}.pill{flex:1;background:#19243c;border-radius:12px;padding:8px;text-align:center;color:var(--muted);font-size:11px}.pill strong{display:block;color:#fff;font-size:16px}
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 18px);left:50%;transform:translateX(-50%);background:#17223b;border:1px solid #33425f;border-radius:14px;padding:11px 16px;display:none;z-index:99;max-width:90%;text-align:center}
+#status{margin-top:12px;color:var(--muted);line-height:1.7}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top">
-    <div><h1>فلش‌کارت من</h1><div class="muted">Anki APKG Reader برای iPhone · v3</div></div>
-    <button id="reset" class="btn danger">پاک کردن</button>
-  </div>
+<header>
+ <div><h1>فلش‌کارت‌های من</h1><div class="sub">کتابخانه شخصی · v5</div></div>
+ <label class="btn primary" for="file">＋ افزودن APKG</label>
+ <input id="file" type="file" accept=".apkg,application/zip">
+</header>
 
-  <section id="loader" class="panel">
-    <div class="drop">
-      <div style="font-size:44px">🗂️</div>
-      <h2>فایل Anki را انتخاب کن</h2>
-      <p class="muted">فایل <b>.apkg</b> روی خود گوشی پردازش می‌شود و جایی آپلود نمی‌شود.</p>
-      <label class="btn primary" for="file">انتخاب فایل APKG</label>
-      <input id="file" type="file" accept=".apkg,application/zip">
-      <div id="status"></div>
-    </div>
-  </section>
+<section id="libraryView" class="panel">
+ <div class="libraryHead"><h2>کتابخانه</h2><span id="libraryCount" class="sub"></span></div>
+ <div id="libraryEmpty">
+   <div class="emptyIcon">📚</div><h2>هنوز فلش‌کارتی نداری</h2>
+   <p class="sub">یک فایل APKG اضافه کن؛ بعداً هر تعداد مجموعه بخواهی می‌توانی نگه داری.</p>
+   <label class="btn primary" for="file">انتخاب فایل APKG</label>
+   <div id="status"></div>
+ </div>
+ <div id="deckGrid" class="deckGrid"></div>
+</section>
 
-  <section id="study" class="panel">
-    <div class="stats"><span id="count"></span><span id="deckName"></span></div>
-    <select id="deckSelect"></select>
-    <div class="progress"><div id="bar"></div></div>
-    <div class="card">
-      <div class="front" id="front"></div>
-      <div class="answer" id="answer"></div>
-      <div class="audio" id="audio"></div>
-    </div>
-    <div class="row" style="margin-top:14px"><button class="btn secondary" id="show">نمایش جواب</button></div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn secondary" id="again">دوباره</button>
-      <button class="btn primary" id="good">بلدم ✓</button>
-    </div>
-    <div class="tiny">پیشرفت روی همین iPhone ذخیره می‌شود.</div>
-  </section>
+<section id="studyView">
+ <button id="back" class="btn secondary back">← کتابخانه</button>
+ <div class="panel">
+   <div class="stats"><span id="studyTitle"></span><b id="count"></b></div>
+   <select id="lessonSelect"></select>
+   <div class="summary">
+    <div class="pill"><strong id="goodN">۰</strong>بلدم</div>
+    <div class="pill"><strong id="againN">۰</strong>دوباره</div>
+    <div class="pill"><strong id="unseenN">۰</strong>دیده‌نشده</div>
+   </div>
+   <div class="progress"><div id="bar"></div></div>
+   <div class="studyCard">
+    <div class="front" id="front"></div>
+    <div class="answer" id="answer"></div>
+    <div class="audio" id="audio"></div>
+   </div>
+   <div class="row"><button id="show" class="btn secondary">نمایش جواب</button></div>
+   <div class="row"><button id="again" class="btn secondary">دوباره</button><button id="good" class="btn primary">بلدم ✓</button></div>
+ </div>
+</section>
 </div>
+<div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fzstd@0.1.1/umd/index.js"></script>
 <script>
-const $=s=>document.querySelector(s);
-let cards=[], filtered=[], idx=0, mediaMap={}, zip=null, db=null, deckMap={};
-const td=new TextDecoder("utf-8");
+const $=s=>document.querySelector(s), td=new TextDecoder("utf-8");
+const FD=["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"], fa=n=>String(n).replace(/\d/g,d=>FD[+d]);
+let current=null, zip=null, mediaMap={}, filtered=[], idx=0;
+const clean=s=>(s||"").replace(/\[sound:[^\]]+\]/g,"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").trim();
+const sounds=s=>[...(s||"").matchAll(/\[sound:([^\]]+)\]/g)].map(x=>x[1]);
+const zstd=u=>u&&u[0]===0x28&&u[1]===0xB5&&u[2]===0x2F&&u[3]===0xFD?window.fzstd.decompress(u):u;
+function rv(b,p){let v=0,s=0,x;do{x=b[p++];v+=(x&127)*2**s;s+=7}while(x&128);return[v,p]}
+function skip(b,p,w){if(w===0)return rv(b,p)[1];if(w===1)return p+8;if(w===2){let r=rv(b,p);return r[1]+r[0]}if(w===5)return p+4;throw Error("protobuf")}
+function entry(m){let p=0,n=null;while(p<m.length){let r=rv(m,p),t=r[0];p=r[1];let f=Math.floor(t/8),w=t%8;if(f===1&&w===2){let q=rv(m,p),l=q[0];p=q[1];n=td.decode(m.slice(p,p+l));p+=l}else p=skip(m,p,w)}return n}
+function mediaIndex(raw){let b=zstd(raw);try{let t=td.decode(b).trim();if(t[0]==="{")return JSON.parse(t)}catch(e){}let p=0,a=[];while(p<b.length){let r=rv(b,p),t=r[0];p=r[1];let f=Math.floor(t/8),w=t%8;if(f===1&&w===2){let q=rv(b,p),l=q[0];p=q[1];let n=entry(b.slice(p,p+l));p+=l;if(n)a.push(n)}else p=skip(b,p,w)}let o={};a.forEach((n,i)=>o[i]=n);return o}
+function mime(n){let e=(n.split(".").pop()||"").toLowerCase();return({mp3:"audio/mpeg",m4a:"audio/mp4",wav:"audio/wav",ogg:"audio/ogg",opus:"audio/ogg"})[e]||"application/octet-stream"}
+function toast(t){$("#toast").textContent=t;$("#toast").style.display="block";setTimeout(()=>$("#toast").style.display="none",2200)}
 
-function setStatus(msg, cls=""){ $("#status").className=cls; $("#status").textContent=msg; }
-function clean(s){
-  return (s||"")
-    .replace(/\[sound:[^\]]+\]/g,"")
-    .replace(/\x1f/g," ")
-    .replace(/<br\s*\/?>/gi,"\n")
-    .replace(/<[^>]+>/g,"")
-    .replace(/&nbsp;/g," ")
-    .replace(/&amp;/g,"&")
-    .replace(/&lt;/g,"<").replace(/&gt;/g,">")
-    .trim();
-}
-const mediaNames=s=>[...(s||"").matchAll(/\[sound:([^\]]+)\]/g)].map(x=>x[1]);
+const DB="flash-library-v5", STORE="kv";
+function odb(){return new Promise((ok,no)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE)};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function get(k){let d=await odb();return new Promise((ok,no)=>{let r=d.transaction(STORE).objectStore(STORE).get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function set(k,v){let d=await odb();return new Promise((ok,no)=>{let x=d.transaction(STORE,"readwrite");x.objectStore(STORE).put(v,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}
+async function del(k){let d=await odb();return new Promise((ok,no)=>{let x=d.transaction(STORE,"readwrite");x.objectStore(STORE).delete(k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}
+async function library(){return(await get("library"))||[]}
+async function saveLibrary(x){await set("library",x)}
 
-function isZstd(u8){
-  return u8 && u8.length>=4 && u8[0]===0x28 && u8[1]===0xB5 && u8[2]===0x2F && u8[3]===0xFD;
+async function parseAPKG(file){
+ zip=await JSZip.loadAsync(file); mediaMap={};
+ if(zip.file("media"))mediaMap=mediaIndex(await zip.file("media").async("uint8array"));
+ let df=zip.file("collection.anki21b")||zip.file("collection.anki21")||zip.file("collection.anki2");if(!df)throw Error("دیتابیس Anki پیدا نشد");
+ let SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
+ let db=new SQL.Database(zstd(await df.async("uint8array"))), decks={};
+ try{let r=db.exec("select id,name from decks");if(r.length)r[0].values.forEach(x=>decks[String(x[0])]=String(x[1]).replace(/\x1f/g,"::"))}catch(e){
+  try{let r=db.exec("select decks from col"),o=JSON.parse(r[0].values[0][0]);Object.keys(o).forEach(k=>decks[k]=o[k].name)}catch(_){}
+ }
+ let r=db.exec("select n.id,n.flds,c.did from notes n join cards c on c.nid=n.id group by n.id order by c.id");if(!r.length)throw Error("کارتی پیدا نشد");
+ let cards=r[0].values.map(x=>{let f=String(x[1]).split("\x1f"),raw=f.join(" ");return{id:String(x[0]),did:String(x[2]),front:clean(f[0]),back:clean(f[1]||f[0]),sounds:sounds(raw)}});
+ return{cards,decks,mediaMap};
 }
-function maybeZstd(u8){
-  if(isZstd(u8)){
-    if(!window.fzstd) throw new Error("کتابخانه Zstandard بارگذاری نشد. اینترنت را بررسی کن.");
-    return window.fzstd.decompress(u8);
-  }
-  return u8;
+function shortName(n){let p=(n||"Deck").split("::");return p[p.length-1]}
+async function importFile(file){
+ $("#status").textContent="در حال افزودن به کتابخانه…";
+ try{
+  let parsed=await parseAPKG(file), libs=await library();
+  let id="d_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+  let title=file.name.replace(/\.(apkg|colpkg)$/i,"").replace(/\(\+?audio\)/ig,"").trim();
+  let item={id,title,fileName:file.name,total:parsed.cards.length,created:Date.now(),review:{},positions:{all:0},selected:"all",decks:parsed.decks};
+  await set("blob:"+id,file); await set("cards:"+id,parsed.cards); await set("media:"+id,parsed.mediaMap);
+  libs.unshift(item);await saveLibrary(libs);$("#status").textContent="";await renderLibrary();toast("به کتابخانه اضافه شد ✓");
+ }catch(e){console.error(e);$("#status").textContent="خطا: "+e.message}
 }
-function readVarint(buf, pos){
-  let val=0, shift=0, b;
-  do{
-    if(pos>=buf.length) throw new Error("protobuf ناقص است");
-    b=buf[pos++]; val += (b & 0x7f) * Math.pow(2,shift); shift+=7;
-  }while(b & 0x80);
-  return [val,pos];
+async function renderLibrary(){
+ let libs=await library(),g=$("#deckGrid");g.innerHTML="";$("#libraryEmpty").style.display=libs.length?"none":"block";$("#libraryCount").textContent=libs.length?`${fa(libs.length)} مجموعه`:"";
+ for(const d of libs){
+  let reviewed=Object.keys(d.review||{}).length,pct=d.total?Math.round(reviewed/d.total*100):0;
+  let el=document.createElement("div");el.className="deckCard";
+  el.innerHTML=`<div class="deckTop"><div><div class="deckTitle">${d.title}</div><div class="deckMeta">${fa(d.total)} کارت · ${fa(Object.keys(d.decks||{}).length)} درس</div></div><div class="ring">${fa(pct)}٪</div></div><div class="miniProgress"><div style="width:${pct}%"></div></div><div class="cardActions"><button class="btn primary open">ادامه مطالعه</button><button class="btn danger remove">حذف</button></div>`;
+  el.querySelector(".open").onclick=e=>{e.stopPropagation();openDeck(d.id)};el.onclick=()=>openDeck(d.id);
+  el.querySelector(".remove").onclick=async e=>{e.stopPropagation();if(confirm(`«${d.title}» از کتابخانه حذف شود؟`)){let a=await library();a=a.filter(x=>x.id!==d.id);await saveLibrary(a);await del("blob:"+d.id);await del("cards:"+d.id);await del("media:"+d.id);renderLibrary()}};
+  g.appendChild(el);
+ }
 }
-function skipField(buf,pos,wire){
-  if(wire===0){ let r=readVarint(buf,pos); return r[1]; }
-  if(wire===1) return pos+8;
-  if(wire===2){ let r=readVarint(buf,pos); return r[1]+r[0]; }
-  if(wire===5) return pos+4;
-  throw new Error("wire type پشتیبانی نمی‌شود: "+wire);
+async function openDeck(id){
+ let libs=await library();current=libs.find(x=>x.id===id);if(!current)return;
+ let blob=await get("blob:"+id);current.cards=await get("cards:"+id);mediaMap=await get("media:"+id)||{};zip=await JSZip.loadAsync(blob);
+ $("#libraryView").style.display="none";$("#studyView").style.display="block";$("#studyTitle").textContent=current.title;
+ let ids=[...new Set(current.cards.map(c=>c.did))].sort((a,b)=>shortName(current.decks[a]).localeCompare(shortName(current.decks[b]),"fr",{numeric:true}));
+ $("#lessonSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+ids.map(x=>`<option value="${x}">${shortName(current.decks[x])}</option>`).join("");
+ $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();render();
 }
-function parseMediaEntry(msg){
-  let pos=0, name=null;
-  while(pos<msg.length){
-    let r=readVarint(msg,pos), tag=r[0]; pos=r[1];
-    let field=Math.floor(tag/8), wire=tag%8;
-    if(field===1 && wire===2){
-      let rr=readVarint(msg,pos), len=rr[0]; pos=rr[1];
-      name=td.decode(msg.slice(pos,pos+len)); pos+=len;
-    } else pos=skipField(msg,pos,wire);
-  }
-  return name;
+function apply(){let v=$("#lessonSelect").value;filtered=v==="all"?current.cards:current.cards.filter(c=>c.did===v);idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
+async function persist(){
+ let libs=await library(),i=libs.findIndex(x=>x.id===current.id);if(i>=0){let keep={...current};delete keep.cards;libs[i]=keep;await saveLibrary(libs)}
 }
-function parseMediaProto(buf){
-  let pos=0, names=[];
-  while(pos<buf.length){
-    let r=readVarint(buf,pos), tag=r[0]; pos=r[1];
-    let field=Math.floor(tag/8), wire=tag%8;
-    if(field===1 && wire===2){
-      let rr=readVarint(buf,pos), len=rr[0]; pos=rr[1];
-      let msg=buf.slice(pos,pos+len); pos+=len;
-      let name=parseMediaEntry(msg);
-      if(name) names.push(name);
-    } else pos=skipField(buf,pos,wire);
-  }
-  return names;
-}
-function parseMediaIndex(raw){
-  let bytes=maybeZstd(raw);
-  // Old APKG: JSON object {"0":"file.mp3",...}
-  try{
-    let txt=td.decode(bytes).trim();
-    if(txt.startsWith("{")){
-      let obj=JSON.parse(txt);
-      return obj;
-    }
-  }catch(e){}
-  // New APKG: protobuf, entries are in the same order as numeric ZIP members.
-  let names=parseMediaProto(bytes);
-  let obj={};
-  names.forEach((name,i)=>obj[String(i)]=name);
-  return obj;
-}
-function mimeFor(name){
-  let ext=(name.split(".").pop()||"").toLowerCase();
-  return ({mp3:"audio/mpeg",m4a:"audio/mp4",aac:"audio/aac",wav:"audio/wav",ogg:"audio/ogg",opus:"audio/ogg",
-           webp:"image/webp",jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif"})[ext] || "application/octet-stream";
-}
-
-async function loadAPKG(file){
-  try{
-    setStatus("در حال باز کردن فایل…");
-    zip=await JSZip.loadAsync(file);
-
-    mediaMap={};
-    if(zip.file("media")){
-      setStatus("در حال خواندن فایل‌های صوتی…");
-      const raw=await zip.file("media").async("uint8array");
-      mediaMap=parseMediaIndex(raw);
-    }
-
-    // Modern Anki exports keep the real database in collection.anki21b
-    // (Zstandard-compressed). collection.anki2 can be only a one-card
-    // compatibility database telling old clients to update.
-    let dbFile = zip.file("collection.anki21b") || zip.file("collection.anki21") || zip.file("collection.anki2");
-    if(!dbFile) throw new Error("دیتابیس Anki داخل فایل پیدا نشد.");
-    setStatus("در حال خواندن دیتابیس اصلی فلش‌کارت‌ها…");
-    let bytes=await dbFile.async("uint8array");
-    bytes=maybeZstd(bytes);
-
-    const SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
-    db=new SQL.Database(bytes);
-
-    let decks={};
-    try{
-      let col=db.exec("select decks from col")[0].values[0][0];
-      decks=JSON.parse(col);
-    }catch(e){}
-    deckMap=decks;
-
-    let res=db.exec("select n.id, n.flds, c.did from notes n join cards c on c.nid=n.id group by n.id order by c.id");
-    if(!res.length) throw new Error("هیچ کارتی پیدا نشد.");
-
-    cards=res[0].values.map((r,i)=>{
-      let fields=String(r[1]).split("\x1f");
-      let raw=fields.join(" ");
-      return {
-        id:String(r[0]),
-        did:String(r[2]),
-        front:clean(fields[0]||""),
-        back:clean(fields[1]||fields[0]||""),
-        sounds:mediaNames(raw)
-      };
-    });
-
-    setupDecks();
-    $("#loader").style.display="none";
-    $("#study").style.display="block";
-    restore();
-    render();
-  }catch(err){
-    console.error(err);
-    setStatus("خطا: "+err.message,"err");
-  }
-}
-
-function deckName(did){
-  let d=deckMap[did]||deckMap[Number(did)];
-  return d && d.name ? d.name : "Deck";
-}
-function setupDecks(){
-  let ids=[...new Set(cards.map(c=>c.did))];
-  $("#deckSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+
-    ids.map(id=>`<option value="${id}">${deckName(id)}</option>`).join("");
-  $("#deckSelect").onchange=()=>{idx=0;applyFilter();render();save()};
-  applyFilter();
-}
-function applyFilter(){
-  let v=$("#deckSelect").value;
-  filtered=v==="all"?cards:cards.filter(c=>c.did===v);
-  $("#deckName").textContent=v==="all"?"همه":deckName(v);
-}
-async function renderAudio(card){
-  const box=$("#audio"); box.innerHTML="";
-  for(const name of card.sounds){
-    const key=Object.keys(mediaMap).find(k=>mediaMap[k]===name);
-    if(key!=null && zip.file(key)){
-      try{
-        let raw=await zip.file(key).async("uint8array");
-        let data=maybeZstd(raw);
-        let blob=new Blob([data],{type:mimeFor(name)});
-        let a=document.createElement("audio");
-        a.controls=true; a.preload="metadata"; a.src=URL.createObjectURL(blob);
-        box.appendChild(a);
-      }catch(e){ console.warn("Audio error",name,e); }
-    }
-  }
-}
-function render(){
-  if(!filtered.length)return;
-  if(idx>=filtered.length)idx=0;
-  let c=filtered[idx];
-  $("#front").textContent=c.front||"(بدون متن)";
-  $("#answer").textContent=c.back||"(بدون جواب)";
-  $("#answer").style.display="none";
-  $("#show").style.display="block";
-  $("#count").textContent=`${idx+1} / ${filtered.length}`;
-  $("#bar").style.width=((idx+1)/filtered.length*100)+"%";
-  renderAudio(c);
-}
-function save(){
-  localStorage.setItem("apkg-progress-v2",JSON.stringify({idx,deck:$("#deckSelect").value}));
-}
-function restore(){
-  try{
-    let p=JSON.parse(localStorage.getItem("apkg-progress-v2"));
-    if(p){
-      $("#deckSelect").value=p.deck||"all";
-      applyFilter();
-      idx=Math.min(p.idx||0,Math.max(0,filtered.length-1));
-    }
-  }catch(e){}
-}
-$("#file").onchange=e=>{let f=e.target.files[0]; if(f)loadAPKG(f)};
+function summary(){let g=0,a=0;filtered.forEach(c=>{if(current.review[c.id]==="good")g++;else if(current.review[c.id]==="again")a++});$("#goodN").textContent=fa(g);$("#againN").textContent=fa(a);$("#unseenN").textContent=fa(filtered.length-g-a)}
+async function renderAudio(c){let box=$("#audio");box.innerHTML="";for(const n of c.sounds){let k=Object.keys(mediaMap).find(x=>mediaMap[x]===n);if(k!=null&&zip.file(k)){try{let b=zstd(await zip.file(k).async("uint8array")),a=document.createElement("audio");a.controls=true;a.src=URL.createObjectURL(new Blob([b],{type:mime(n)}));box.appendChild(a)}catch(e){}}}}
+function render(){if(!filtered.length)return;let c=filtered[idx];$("#front").textContent=c.front||"(بدون متن)";$("#answer").textContent=c.back||"(بدون جواب)";$("#answer").style.display="none";$("#show").style.display="block";$("#count").textContent=`${fa(idx+1)} از ${fa(filtered.length)}`;$("#bar").style.width=((idx+1)/filtered.length*100)+"%";summary();renderAudio(c)}
+async function mark(s){current.review[cid()]=s;let v=$("#lessonSelect").value;idx=(idx+1)%filtered.length;current.positions[v]=idx;await persist();render()}
+function cid(){return filtered[idx].id}
+$("#file").onchange=e=>{let f=e.target.files[0];if(f){importFile(f);e.target.value=""}};
+$("#back").onclick=async()=>{$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
+$("#lessonSelect").onchange=async()=>{current.selected=$("#lessonSelect").value;apply();await persist();render()};
 $("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none"};
-$("#good").onclick=()=>{idx=(idx+1)%filtered.length;save();render()};
-$("#again").onclick=()=>{idx=(idx+1)%filtered.length;save();render()};
-$("#reset").onclick=()=>{localStorage.removeItem("apkg-progress-v2");location.reload()};
+$("#good").onclick=()=>mark("good");$("#again").onclick=()=>mark("again");
+renderLibrary();
 </script>
 </body>
 </html>
