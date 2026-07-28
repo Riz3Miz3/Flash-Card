@@ -36,7 +36,7 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <div><h1>فلش‌کارت من</h1><div class="muted">Anki APKG Reader برای iPhone</div></div>
+    <div><h1>فلش‌کارت من</h1><div class="muted">Anki APKG Reader برای iPhone · v3</div></div>
     <button id="reset" class="btn danger">پاک کردن</button>
   </div>
 
@@ -176,10 +176,14 @@ async function loadAPKG(file){
       mediaMap=parseMediaIndex(raw);
     }
 
-    let dbFile=zip.file("collection.anki2");
-    if(!dbFile) throw new Error("collection.anki2 پیدا نشد.");
-    setStatus("در حال خواندن فلش‌کارت‌ها…");
+    // Modern Anki exports keep the real database in collection.anki21b
+    // (Zstandard-compressed). collection.anki2 can be only a one-card
+    // compatibility database telling old clients to update.
+    let dbFile = zip.file("collection.anki21b") || zip.file("collection.anki21") || zip.file("collection.anki2");
+    if(!dbFile) throw new Error("دیتابیس Anki داخل فایل پیدا نشد.");
+    setStatus("در حال خواندن دیتابیس اصلی فلش‌کارت‌ها…");
     let bytes=await dbFile.async("uint8array");
+    bytes=maybeZstd(bytes);
 
     const SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
     db=new SQL.Database(bytes);
