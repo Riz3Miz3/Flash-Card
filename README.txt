@@ -1,3 +1,5 @@
+v5.1: iPhone file picker fix. Removed the HTML accept filter so .apkg files are selectable in iOS Files.
+
 Flashcard WebApp v5
 
 Library-based version:

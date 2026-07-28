@@ -45,9 +45,9 @@ select{width:100%;margin:10px 0;background:#202c47;color:#fff;border:1px solid #
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های من</h1><div class="sub">کتابخانه شخصی · v5</div></div>
+ <div><h1>فلش‌کارت‌های من</h1><div class="sub">کتابخانه شخصی · v5.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
- <input id="file" type="file" accept=".apkg,application/zip">
+ <input id="file" type="file">
 </header>
 
 <section id="libraryView" class="panel">
@@ -162,7 +162,18 @@ async function renderAudio(c){let box=$("#audio");box.innerHTML="";for(const n o
 function render(){if(!filtered.length)return;let c=filtered[idx];$("#front").textContent=c.front||"(بدون متن)";$("#answer").textContent=c.back||"(بدون جواب)";$("#answer").style.display="none";$("#show").style.display="block";$("#count").textContent=`${fa(idx+1)} از ${fa(filtered.length)}`;$("#bar").style.width=((idx+1)/filtered.length*100)+"%";summary();renderAudio(c)}
 async function mark(s){current.review[cid()]=s;let v=$("#lessonSelect").value;idx=(idx+1)%filtered.length;current.positions[v]=idx;await persist();render()}
 function cid(){return filtered[idx].id}
-$("#file").onchange=e=>{let f=e.target.files[0];if(f){importFile(f);e.target.value=""}};
+$("#file").onchange=e=>{
+  let f=e.target.files[0];
+  if(f){
+    if(!/\.(apkg|colpkg)$/i.test(f.name||"")){
+      toast("لطفاً فایل APKG انتخاب کن");
+      e.target.value="";
+      return;
+    }
+    importFile(f);
+    e.target.value="";
+  }
+};
 $("#back").onclick=async()=>{$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
 $("#lessonSelect").onchange=async()=>{current.selected=$("#lessonSelect").value;apply();await persist();render()};
 $("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none"};
