@@ -1,12 +1,9 @@
-فلش‌کارت‌های سمانه 🌸 — Complete 1.1
+فلش‌کارت‌های سمانه 🌸 — Complete 1.3
 
-Added clickable review-category counters:
-- دوباره
-- سخت
-- خوب
-- آسان
-- جدید
-
-Tap any counter while studying to open the cards currently in that category.
-Tap a card in the list to jump directly to that card and review it.
-All Complete 1.0 features and existing IndexedDB progress remain compatible.
+- مرتب‌سازی بر اساس تاریخ ورود: قدیمی‌تر به جدیدتر
+- مرتب‌سازی بر اساس تاریخ ورود: جدیدتر به قدیمی‌تر
+- حالت ترتیب دستی
+- در حالت دستی، با دستگیره ↕ مجموعه‌ها را جابه‌جا کن
+- جابه‌جایی لمسی برای iPhone هم اضافه شده
+- هر دو Progress قبلی حفظ شده‌اند
+- ساختار IndexedDB قبلی حفظ شده و Progress پاک نمی‌شود
