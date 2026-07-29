@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Cloud Sync 2.3 — clickable review category filters */
+/* Cloud Sync 2.4 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Cloud Sync 2.3 — library ordering */
+/* Cloud Sync 2.4 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -185,7 +185,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
 
-/* Cloud Sync 2.3 */
+/* Cloud Sync 2.4 */
 #cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
 .cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
 .cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
@@ -202,7 +202,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
 
 
-/* Cloud Sync 2.3 — global card status */
+/* Cloud Sync 2.4 — global card status */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;position:sticky;top:0;background:#111a2e;padding:2px 0 8px;z-index:2}
 .statusTab{border:1px solid #334563;background:#202c47;color:#fff;border-radius:12px;padding:10px 4px;font:inherit;font-size:12px;font-weight:800}
 .statusTab b{display:block;margin-top:4px;color:#aab8d5;font-size:11px}.statusTab.active{background:#ffc300;color:#111827;border-color:#ffc300}.statusTab.active b{color:#111827}
@@ -215,7 +215,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 @media(max-width:390px){.statusTabs{gap:4px}.statusTab{font-size:10px;padding:8px 2px}}
 
 
-/* Cloud Sync 2.3 — interaction + progress fixes */
+/* Cloud Sync 2.4 — interaction + progress fixes */
 .todayStat.dashboardFilter{cursor:pointer;border:1px solid transparent;transition:transform .12s ease,border-color .12s ease,background .12s ease;user-select:none;-webkit-user-select:none}
 .todayStat.dashboardFilter:active{transform:scale(.975);border-color:#fbbf24;background:#263654}
 .todayStat.dashboardFilter::after{content:"مشاهده";display:block;font-size:8px;color:#7183a4;margin-top:3px}
@@ -237,7 +237,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.3</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.4</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -416,8 +416,8 @@ async function parseAPKG(file){
  try{let r=db.exec("select id,name from decks");if(r.length)r[0].values.forEach(x=>decks[String(x[0])]=String(x[1]).replace(/\x1f/g,"::"))}catch(e){
   try{let r=db.exec("select decks from col"),o=JSON.parse(r[0].values[0][0]);Object.keys(o).forEach(k=>decks[k]=o[k].name)}catch(_){}
  }
- let r=db.exec("select n.id,n.flds,c.did from notes n join cards c on c.nid=n.id group by n.id order by c.id");if(!r.length)throw Error("کارتی پیدا نشد");
- let cards=r[0].values.map(x=>{let f=String(x[1]).split("\x1f"),raw=f.join(" ");return{id:String(x[0]),did:String(x[2]),front:clean(f[0]),back:clean(f[1]||f[0]),sounds:sounds(raw),tags:[],suspended:false}});
+ let r=db.exec("select n.id,n.flds,c.did,min(c.id) as card_order from notes n join cards c on c.nid=n.id group by n.id,c.did order by card_order");if(!r.length)throw Error("کارتی پیدا نشد");
+ let cards=r[0].values.map((x,i)=>{let f=String(x[1]).split("\x1f"),frontRaw=f[0]||"",backRaw=f[1]||f[0]||"",frontSounds=sounds(frontRaw),backSounds=sounds(backRaw);return{id:String(x[0]),did:String(x[2]),front:clean(frontRaw),back:clean(backRaw),frontSounds,backSounds,sounds:[...new Set([...frontSounds,...backSounds])],order:Number(x[3])||i,tags:[],suspended:false}});
  return{cards,decks,mediaMap};
 }
 function shortName(n){let p=(n||"Deck").split("::");return p[p.length-1]}
@@ -529,7 +529,7 @@ async function openDeck(id){
  $("#lessonSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+ids.map(x=>`<option value="${x}">${shortName(current.decks[x])}</option>`).join("");
  $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();await persistSeenIfNeeded(filtered[idx]);render();
 }
-function apply(){let v=$("#lessonSelect").value;filtered=v==="all"?current.cards:current.cards.filter(c=>c.did===v);idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
+function apply(){let v=$("#lessonSelect").value;if(v==="__today__"&&studyQueueMode==="today")return;filtered=v==="all"?current.cards:current.cards.filter(c=>String(c.did)===String(v));idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
 async function persist(){
  let libs=await library(),i=libs.findIndex(x=>x.id===current.id);
  if(i>=0){let keep={...current};delete keep.cards;keep.localUpdatedAt=Date.now();libs[i]=keep;await saveLibrary(libs)}
@@ -537,7 +537,21 @@ async function persist(){
  scheduleCloudSync()
 }
 function summary(){let n={again:0,hard:0,good:0,easy:0},seen=0;filtered.forEach(c=>{let s=(current.review||{})[c.id];if(n[s]!=null){n[s]++;seen++}});$("#againN").textContent=fa(n.again);$("#hardN").textContent=fa(n.hard);$("#goodN").textContent=fa(n.good);$("#easyN").textContent=fa(n.easy);$("#unseenN").textContent=fa(filtered.length-seen)}
-async function renderAudio(c){let box=$("#audio");box.innerHTML="";for(const n of c.sounds){let k=Object.keys(mediaMap).find(x=>mediaMap[x]===n);if(k!=null&&zip.file(k)){try{let b=zstd(await zip.file(k).async("uint8array")),a=document.createElement("audio");a.controls=true;a.src=URL.createObjectURL(new Blob([b],{type:mime(n)}));box.appendChild(a)}catch(e){}}}}
+async function renderAudio(c,side="front"){
+ let box=$("#audio");box.innerHTML="";
+ let names=side==="back"?(c.backSounds||[]):(c.frontSounds||[]);
+ // Old cached cards are migrated automatically; this fallback is only defensive.
+ if(!names.length && !c.frontSounds && !c.backSounds)names=c.sounds||[];
+ for(const n of [...new Set(names)]){
+   let k=Object.keys(mediaMap).find(x=>mediaMap[x]===n);
+   if(k!=null&&zip?.file(k)){
+     try{
+       let b=zstd(await zip.file(k).async("uint8array")),a=document.createElement("audio");
+       a.controls=true;a.preload="metadata";a.src=URL.createObjectURL(new Blob([b],{type:mime(n)}));box.appendChild(a)
+     }catch(e){console.warn("audio",e)}
+   }
+ }
+}
 function fmtDelay(ms){let m=Math.max(1,Math.round(ms/60000));if(m<60)return m+"m";let hr=Math.round(m/60);if(hr<24)return hr+"h";return Math.round(hr/24)+"d"}
 function reviewIntervals(c){
  current.srs=current.srs||{};
@@ -555,7 +569,16 @@ function reviewIntervals(c){
  }
 }
 function updateReviewTimes(c){let t=reviewIntervals(c);$("#againTime").textContent=t.again<=60000?"<1m":fmtDelay(t.again);$("#hardTime").textContent=t.hard<=360000?"<6m":fmtDelay(t.hard);$("#goodTime").textContent=t.good<=600000?"<10m":fmtDelay(t.good);$("#easyTime").textContent=fmtDelay(t.easy)}
-function render(){if(!filtered.length)return;let c=filtered[idx];$("#front").textContent=c.front||"(بدون متن)";$("#answer").textContent=c.back||"(بدون جواب)";$("#answer").style.display="none";$("#show").style.display="block";$("#review4").style.display="none";$("#count").textContent=`${fa(idx+1)} از ${fa(filtered.length)}`;$("#bar").style.width=((idx+1)/filtered.length*100)+"%";updateReviewTimes(c);summary();renderAudio(c)}
+function render(){
+ if(!filtered.length)return;
+ let c=filtered[idx];
+ $("#front").textContent=c.front||"(بدون متن)";
+ $("#answer").textContent=c.back||"(بدون جواب)";
+ $("#answer").style.display="none";$("#show").style.display="block";$("#review4").style.display="none";
+ $("#count").textContent=`${fa(idx+1)} از ${fa(filtered.length)}`;
+ $("#bar").style.width=((idx+1)/filtered.length*100)+"%";
+ updateReviewTimes(c);summary();renderAudio(c,"front")
+}
 async function mark(s){
  let id=cid(),c=filtered[idx],now=Date.now(),t=reviewIntervals(c);
  current.review=current.review||{};current.srs=current.srs||{};current.history=current.history||[];
@@ -568,7 +591,15 @@ async function mark(s){
  let diff=Math.max(1,Math.min(10,(o.difficulty||5)+(s==="again"?1:s==="hard"?.4:s==="easy"?-.5:-.15)));
  current.srs[id]={reps:(o.reps||0)+1,interval:t[s],stability:t[s],difficulty:diff,due:now+t[s],ease:ease,last:s,lastReviewed:now};
  current.history.push({cardId:id,rating:s,at:now,deckId:c.did});
- let v=$("#lessonSelect").value;idx=(idx+1)%filtered.length;current.positions[v]=idx;
+ let v=$("#lessonSelect").value;
+ if(studyQueueMode==="today" && idx>=filtered.length-1){
+   current.positions[v]=filtered.length;
+   await persist();await dashboard();
+   toast("کارت‌های این بخش از برنامه امروز تمام شد ✓");
+   document.body.classList.remove("studying");$("#studyView").style.display="none";$("#libraryView").style.display="block";
+   current=null;studyQueueMode=null;$("#studyModeLabel").textContent="";await renderLibrary();return
+ }
+ idx=(idx+1)%filtered.length;current.positions[v]=idx;
  await persist();
  render();
  dashboard()
@@ -587,7 +618,13 @@ $("#file").onchange=e=>{
   }
 };
 $("#back").onclick=async()=>{document.body.classList.remove("studying");$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()};
-$("#lessonSelect").onchange=async()=>{current.selected=$("#lessonSelect").value;apply();noteSeen(filtered[idx]);await persist();render()};
+$("#lessonSelect").onchange=async()=>{
+ const v=$("#lessonSelect").value;
+ current.selected=v;
+ if(v==="__today__"&&studyQueueMode==="today"){idx=Math.min(current.positions.__today__||0,Math.max(0,filtered.length-1))}
+ else{studyQueueMode=null;$("#studyModeLabel").textContent="";apply()}
+ noteSeen(filtered[idx]);await persist();render()
+};
 
 async function browseCard(delta){
   if(!filtered.length)return;
@@ -662,7 +699,7 @@ async function finishSwipe(e){
 studyCard.addEventListener("pointerup",finishSwipe);
 studyCard.addEventListener("pointercancel",finishSwipe);
 
-$("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid"};
+$("#show").onclick=()=>{let c=filtered[idx];$("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid";renderAudio(c,"back")};
 $("#again").onclick=()=>mark("again");$("#hard").onclick=()=>mark("hard");$("#good").onclick=()=>mark("good");$("#easy").onclick=()=>mark("easy");
 
 // Complete 1.0 migration + study engine. Existing IndexedDB keys are preserved.
@@ -671,6 +708,37 @@ let studyQueueMode=null, editCardId=null;
 
 async function appSettings(){
  return Object.assign({dailyNew:20,dailyReview:200,retention:.90},(await get("settings"))||{})
+}
+async function upgradeStoredCardSchema(d){
+ const schemaKey="cardSchema24:"+d.id;
+ if(await get(schemaKey))return false;
+ let blob=await get("blob:"+d.id);
+ if(!blob)return false;
+ try{
+   // Re-read only structural data from the already-saved APKG.
+   // Study history/progress/SRS are kept from the existing library record.
+   let parsed=await parseAPKG(blob),oldCards=(await get("cards:"+d.id))||[],oldMap=new Map(oldCards.map(c=>[String(c.id),c]));
+   let upgraded=parsed.cards.map(fresh=>{
+     let old=oldMap.get(String(fresh.id))||{};
+     return{
+       ...fresh,
+       // Preserve user-editable/local fields from the old cached card.
+       front:old.front??fresh.front,
+       back:old.back??fresh.back,
+       tags:Array.isArray(old.tags)?old.tags:(fresh.tags||[]),
+       suspended:old.suspended??false,
+       localUpdatedAt:old.localUpdatedAt||null
+     }
+   });
+   await set("cards:"+d.id,upgraded);
+   await set("media:"+d.id,parsed.mediaMap||{});
+   if((!d.decks||!Object.keys(d.decks).length)&&parsed.decks)d.decks=parsed.decks;
+   await set(schemaKey,true);
+   return true
+ }catch(e){
+   console.warn("card schema migration failed",d.id,e);
+   return false
+ }
 }
 async function migrateAll(){
  let libs=await library(),changed=false;
@@ -681,13 +749,22 @@ async function migrateAll(){
   if(!d.positions){d.positions={all:0};changed=true}
   if(!d.selected){d.selected="all";changed=true}
   if(!d.seen){d.seen={};changed=true}
+
+  // Crucial update migration: upgrades cards already stored on the device.
+  // The user never needs to delete and re-add the APKG after an app update.
+  if(await upgradeStoredCardSchema(d)){changed=true}
+
   let cards=await get("cards:"+d.id);
   if(cards){
    let cc=false;
-   cards.forEach(c=>{if(!Array.isArray(c.tags)){c.tags=[];cc=true}if(c.suspended==null){c.suspended=false;cc=true};if((d.review||{})[c.id]&&!d.seen[c.id]){d.seen[c.id]=Date.now();changed=true}});
-   // Recover old lesson browsing progress from the saved lesson position where possible.
+   cards.forEach(c=>{
+     if(!Array.isArray(c.tags)){c.tags=[];cc=true}
+     if(c.suspended==null){c.suspended=false;cc=true}
+     if((d.review||{})[c.id]&&!d.seen[c.id]){d.seen[c.id]=Date.now();changed=true}
+   });
+   // Recover old lesson browsing progress from saved positions without resetting anything.
    for(const [deckKey,posRaw] of Object.entries(d.positions||{})){
-     if(deckKey==="all")continue;
+     if(deckKey==="all"||deckKey==="__today__")continue;
      const pos=Math.max(0,Number(posRaw)||0),lessonCards=cards.filter(c=>String(c.did)===String(deckKey));
      if(lessonCards.length && Object.prototype.hasOwnProperty.call(d.positions,deckKey)){
        lessonCards.slice(0,Math.min(lessonCards.length,pos+1)).forEach(c=>{if(!d.seen[c.id]){d.seen[c.id]=Date.now();changed=true}})
@@ -696,7 +773,11 @@ async function migrateAll(){
    if(cc)await set("cards:"+d.id,cards)
   }
  }
- if(changed)await saveLibrary(libs)
+ if(changed){
+   await saveLibrary(libs);
+   // Ensure upgraded card structure is propagated to the other device.
+   try{await markLocalDirty();scheduleCloudSync()}catch(_){}
+ }
 }
 function stateOf(d,c,now=Date.now()){
  if(c.suspended)return"suspended";
@@ -741,20 +822,47 @@ function calcStreak(libs){
  for(;;){let k=dt.toISOString().slice(0,10);if(days.has(k)){n++;dt=new Date(dt.getTime()-DAY)}else{if(n===0){dt=new Date(dt.getTime()-DAY);let k2=dt.toISOString().slice(0,10);if(days.has(k2)){n++;dt=new Date(dt.getTime()-DAY);continue}}break}}
  return n
 }
+function sortStudyCards(d,cards){
+ return [...cards].sort((a,b)=>{
+   const la=shortName((d.decks||{})[a.did]||""),lb=shortName((d.decks||{})[b.did]||"");
+   const lessonCmp=la.localeCompare(lb,"fr",{numeric:true,sensitivity:"base"});
+   if(lessonCmp)return lessonCmp;
+   return (Number(a.order)||0)-(Number(b.order)||0)
+ })
+}
 async function openToday(){
  let libs=await library(),settings=await appSettings(),now=Date.now(),queue=[];
  let reviewLeft=Math.max(0,settings.dailyReview),newLeft=Math.max(0,settings.dailyNew);
+
+ // Respect the same visible library ordering the user chose.
+ const pref=(await get("librarySort"))||"import_asc";
+ libs=[...libs];
+ if(pref==="import_asc")libs.sort((a,b)=>(a.created||0)-(b.created||0));
+ else if(pref==="import_desc")libs.sort((a,b)=>(b.created||0)-(a.created||0));
+ else libs.sort((a,b)=>(a.manualOrder||0)-(b.manualOrder||0));
+
  for(let d of libs){
-  let cards=(await get("cards:"+d.id))||[];
-  let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))&&((d.srs||{})[c.id]?.due||0)<=now).slice(0,reviewLeft);
-  reviewLeft-=due.length;
-  let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,newLeft);
-  newLeft-=fresh.length;
-  if(due.length||fresh.length)queue.push({d,cards:[...due,...fresh]});
-  if(reviewLeft<=0&&newLeft<=0)break;
+   let cards=sortStudyCards(d,(await get("cards:"+d.id))||[]);
+   let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))&&((d.srs||{})[c.id]?.due||0)<=now).slice(0,reviewLeft);
+   reviewLeft-=due.length;
+   let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,newLeft);
+   newLeft-=fresh.length;
+   if(due.length||fresh.length)queue.push({d,cards:[...due,...fresh]});
+   if(reviewLeft<=0&&newLeft<=0)break
  }
  if(!queue.length){toast("برای امروز کارتی باقی نمانده ✓");return}
- let q=queue[0];await openDeck(q.d.id);filtered=q.cards;idx=0;studyQueueMode="today";$("#studyModeLabel").textContent="• امروز";render()
+
+ // Study one collection at a time so its APKG/media stays local and reliable.
+ let q=queue[0];
+ await openDeck(q.d.id);
+
+ // Explicit Today mode; do NOT leave an old lesson (e.g. Leçon 03) selected.
+ let opt=document.createElement("option");opt.value="__today__";opt.textContent="برنامه امروز";$("#lessonSelect").prepend(opt);
+ $("#lessonSelect").value="__today__";current.selected="__today__";
+ filtered=q.cards;idx=0;studyQueueMode="today";$("#studyModeLabel").textContent="• امروز";
+ current.positions.__today__=0;
+ await persistSeenIfNeeded(filtered[0]);
+ render()
 }
 async function showBrowser(q=""){
  let all=await allCardsWithDeck(),term=q.trim().toLowerCase(),box=$("#browserList");box.innerHTML="";
@@ -844,7 +952,7 @@ async function openExactCard(collectionId,cardId,deckId,showAnswer=true){
  }else{$("#lessonSelect").value="all";current.selected="all";apply()}
  let found=filtered.findIndex(c=>String(c.id)===String(cardId));
  if(found<0){$("#lessonSelect").value="all";current.selected="all";apply();found=filtered.findIndex(c=>String(c.id)===String(cardId))}
- if(found>=0){idx=found;current.positions[$("#lessonSelect").value]=idx;noteSeen(filtered[idx]);await persist();render();if(showAnswer){$("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid"}}
+ if(found>=0){idx=found;current.positions[$("#lessonSelect").value]=idx;noteSeen(filtered[idx]);await persist();render();if(showAnswer){$("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid";renderAudio(filtered[idx],"back")}}
 }
 
 async function renderGlobalStatus(filter=globalStatusFilter){
@@ -959,7 +1067,7 @@ async function openReviewCategory(filter){
           current.positions[$("#lessonSelect").value]=idx;
           await persist();
           render();
-          $("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid";
+          $("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid";renderAudio(filtered[idx],"back");
         }
       };
       list.appendChild(row);
@@ -976,7 +1084,7 @@ $("#back").onclick=async()=>{studyQueueMode=null;$("#studyModeLabel").textConten
 
 
 // ============================================================
-// Cloud Sync 2.3 — Local-first snapshot sync
+// Cloud Sync 2.4 — Local-first snapshot sync
 // ============================================================
 function setCloudStatus(text,kind=""){
  const x=$("#cloudChip");if(!x)return;x.className="cloudChip "+kind;x.textContent=text
@@ -995,7 +1103,7 @@ async function buildSnapshot(){
    })
  }
  return{
-   schema:2,
+   schema:3,
    updatedAt:Date.now(),
    librarySort:(await get("librarySort"))||"import_asc",
    settings:await appSettings(),
