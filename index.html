@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Cloud Sync 2.5 — clickable review category filters */
+/* Cloud Sync 2.5.1 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Cloud Sync 2.5 — library ordering */
+/* Cloud Sync 2.5.1 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -185,7 +185,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
 
-/* Cloud Sync 2.5 */
+/* Cloud Sync 2.5.1 */
 #cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
 .cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
 .cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
@@ -202,7 +202,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
 
 
-/* Cloud Sync 2.5 — global card status */
+/* Cloud Sync 2.5.1 — global card status */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;position:sticky;top:0;background:#111a2e;padding:2px 0 8px;z-index:2}
 .statusTab{border:1px solid #334563;background:#202c47;color:#fff;border-radius:12px;padding:10px 4px;font:inherit;font-size:12px;font-weight:800}
 .statusTab b{display:block;margin-top:4px;color:#aab8d5;font-size:11px}.statusTab.active{background:#ffc300;color:#111827;border-color:#ffc300}.statusTab.active b{color:#111827}
@@ -215,7 +215,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 @media(max-width:390px){.statusTabs{gap:4px}.statusTab{font-size:10px;padding:8px 2px}}
 
 
-/* Cloud Sync 2.5 — interaction + progress fixes */
+/* Cloud Sync 2.5.1 — interaction + progress fixes */
 .todayStat.dashboardFilter{cursor:pointer;border:1px solid transparent;transition:transform .12s ease,border-color .12s ease,background .12s ease;user-select:none;-webkit-user-select:none}
 .todayStat.dashboardFilter:active{transform:scale(.975);border-color:#fbbf24;background:#263654}
 .todayStat.dashboardFilter::after{content:"مشاهده";display:block;font-size:8px;color:#7183a4;margin-top:3px}
@@ -237,7 +237,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.5</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.5.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -272,7 +272,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
     <div class="todayStat dashboardFilter" role="button" tabindex="0" data-dashboard="reviewed"><strong id="todayReviewsN">۰</strong>مرور امروز</div>
    </div>
    <button id="startTodayBtn" class="btn primary todayStart">شروع مطالعه امروز — <span id="todayTotalN">۰</span> کارت</button>
-   <div id="todaySessionProgress" class="todayRemaining"></div><div id="newRemaining" class="todayRemaining">۰ کارت جدید باقی مانده</div>
+   <div id="newRemaining" class="todayRemaining" style="display:none"></div>
  </div>
  <div id="libraryEmpty">
    <div class="emptyIcon">📚</div><h2>هنوز فلش‌کارتی نداری</h2>
@@ -598,6 +598,7 @@ async function mark(s){
      if(gi<0)gi=session.index||0;
      session.completed=session.completed||{};session.viewed=session.viewed||{};
      session.completed[gi]={rating:s,at:now};session.viewed[gi]=session.viewed[gi]||now;
+     session.maxReached=Math.max(Number(session.maxReached)||0,gi+1);
      let next=-1;
      for(let i=gi+1;i<session.items.length;i++){if(!session.completed[i]){next=i;break}}
      if(next<0)for(let i=0;i<gi;i++){if(!session.completed[i]){next=i;break}}
@@ -642,7 +643,11 @@ $("#back").onclick=async()=>{
    let session=await getTodaySession();
    if(session&&current&&filtered[idx]){
      const gi=session.items.findIndex((x,i)=>!session.completed?.[i]&&x.collectionId===current.id&&String(x.cardId)===String(filtered[idx].id));
-     if(gi>=0){session.index=gi;session.viewed=session.viewed||{};session.viewed[gi]=session.viewed[gi]||Date.now();await saveTodaySession(session)}
+     if(gi>=0){
+       session.index=gi;session.viewed=session.viewed||{};session.viewed[gi]=session.viewed[gi]||Date.now();
+       session.maxReached=Math.max(Number(session.maxReached)||0,gi+1);
+       await saveTodaySession(session)
+     }
    }
  }
  document.body.classList.remove("studying");$("#studyView").style.display="none";$("#libraryView").style.display="block";current=null;await renderLibrary()
@@ -665,7 +670,11 @@ async function browseCard(delta){
    let session=await getTodaySession();
    if(session){
      const cardId=String(filtered[idx].id),globalIndex=session.items.findIndex((x,i)=>i>=0&&x.collectionId===current.id&&String(x.cardId)===cardId&&!session.completed?.[i]);
-     if(globalIndex>=0){session.index=globalIndex;session.viewed=session.viewed||{};session.viewed[globalIndex]=Date.now();await saveTodaySession(session)}
+     if(globalIndex>=0){
+       session.index=globalIndex;session.viewed=session.viewed||{};session.viewed[globalIndex]=Date.now();
+       session.maxReached=Math.max(Number(session.maxReached)||0,globalIndex+1);
+       await saveTodaySession(session)
+     }
    }
  }
  await persist();
@@ -836,6 +845,11 @@ function todayKey(){
 async function getTodaySession(){
  const s=await get("todaySession");
  if(!s||s.date!==todayKey())return null;
+ if(s.maxReached==null){
+   const viewedMax=Math.max(0,...Object.keys(s.viewed||{}).map(x=>(Number(x)||0)+1));
+   s.maxReached=Math.max(viewedMax,Math.min(s.items?.length||0,(Number(s.index)||0)+1));
+   await set("todaySession",s)
+ }
  return s
 }
 async function saveTodaySession(s){
@@ -864,7 +878,7 @@ async function buildTodaySession(){
    if(reviewLeft<=0&&newLeft<=0)break
  }
  if(!items.length)return null;
- const s={date:todayKey(),items,index:0,viewed:{},completed:{},createdAt:Date.now(),updatedAt:Date.now()};
+ const s={date:todayKey(),items,index:0,maxReached:0,viewed:{},completed:{},createdAt:Date.now(),updatedAt:Date.now()};
  await saveTodaySession(s);return s
 }
 async function openTodaySessionAt(session,index){
@@ -885,6 +899,7 @@ async function openTodaySessionAt(session,index){
  if(!opt){opt=document.createElement("option");opt.value="__today__";opt.textContent="برنامه امروز";$("#lessonSelect").prepend(opt)}
  $("#lessonSelect").value="__today__";current.selected="__today__";$("#studyModeLabel").textContent="• امروز";
  session.index=firstGlobal;session.viewed=session.viewed||{};session.viewed[firstGlobal]=Date.now();
+ session.maxReached=Math.max(Number(session.maxReached)||0,firstGlobal+1);
  current.positions.__today__=idx;
  await saveTodaySession(session);await persistSeenIfNeeded(filtered[idx]);render()
 }
@@ -903,20 +918,23 @@ async function dashboard(){
  let reviewToday=Math.min(due+learningDue,Math.max(0,settings.dailyReview));
  let plannedTotal=session?.items?.length ?? (reviewToday+newToday);
  let doneCount=session?Object.keys(session.completed||{}).length:0;
- let viewedCount=session?Object.keys(session.viewed||{}).length:0;
- let remaining=Math.max(0,plannedTotal-doneCount);
+ let reached=session?Math.max(
+   Number(session.maxReached)||0,
+   Math.min(plannedTotal,(Number(session.index)||0)+1),
+   ...Object.keys(session.viewed||{}).map(x=>(Number(x)||0)+1)
+ ):0;
+ let remaining=session?Math.max(0,plannedTotal-reached):plannedTotal;
 
  $("#dueN").textContent=fa(due);
  $("#learningN").textContent=fa(learningDue);
  $("#newN").textContent=fa(newToday);
  $("#todayReviewsN").textContent=fa(reviews);
  $("#todayTotalN").textContent=fa(remaining);
- $("#newRemaining").textContent=fa(Math.max(0,totalNew-newToday))+" کارت جدید باقی مانده";
- $("#todaySessionProgress").textContent=session?`${fa(viewedCount)} از ${fa(plannedTotal)} کارت برنامه امروز مشاهده شده`:"";
+ $("#newRemaining").style.display="none";
 
  $("#startTodayBtn").disabled=plannedTotal===0;
  if(!plannedTotal)$("#startTodayBtn").textContent="برنامه امروز تمام شد ✓";
- else if(session&&(viewedCount>0||doneCount>0))$("#startTodayBtn").textContent="ادامه مطالعه امروز — "+fa(remaining)+" کارت باقی مانده";
+ else if(session&&reached>0)$("#startTodayBtn").textContent="ادامه مطالعه امروز — "+fa(remaining)+" کارت باقی مانده";
  else $("#startTodayBtn").textContent="شروع مطالعه امروز — "+fa(plannedTotal)+" کارت";
 
  $("#streak").textContent="🔥 "+fa(calcStreak(libs))+" روز"
@@ -1179,7 +1197,7 @@ $("#back").onclick=async()=>{await _oldBack();studyQueueMode=null;$("#studyModeL
 
 
 // ============================================================
-// Cloud Sync 2.5 — Local-first snapshot sync
+// Cloud Sync 2.5.1 — Local-first snapshot sync
 // ============================================================
 function setCloudStatus(text,kind=""){
  const x=$("#cloudChip");if(!x)return;x.className="cloudChip "+kind;x.textContent=text
@@ -1198,7 +1216,7 @@ async function buildSnapshot(){
    })
  }
  return{
-   schema:4,
+   schema:5,
    updatedAt:Date.now(),
    librarySort:(await get("librarySort"))||"import_asc",
    settings:await appSettings(),
