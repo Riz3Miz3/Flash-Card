@@ -1,22 +1,12 @@
-فلش‌کارت‌های سمانه 🌸 — Complete 1.0
+فلش‌کارت‌های سمانه 🌸 — Complete 1.1
 
-Comprehensive migration-compatible release based on v5.4.
+Added clickable review-category counters:
+- دوباره
+- سخت
+- خوب
+- آسان
+- جدید
 
-Included:
-- Existing multi-APKG library and audio/media
-- Existing progress is preserved through IndexedDB migration
-- Again / Hard / Good / Easy and next-review times
-- Local spaced-repetition scheduling with due timestamps, stability/difficulty fields
-- Today dashboard: Due / Learning / New / Reviews today
-- Daily new/review limits
-- Study streak and 7-day statistics
-- Browse/search cards
-- Edit question/answer and tags
-- Suspend/reactivate cards
-- Today study queue
-- Backup/Restore including APKG blobs, cards, progress, scheduler, history, settings
-- iPhone fullscreen study UI
-- Swipe RIGHT = next; LEFT = previous
-- Same IndexedDB database/key scheme retained for GitHub Pages updates
-
-Important: this build uses an FSRS-inspired local scheduler, not the official Anki FSRS implementation.
+Tap any counter while studying to open the cards currently in that category.
+Tap a card in the list to jump directly to that card and review it.
+All Complete 1.0 features and existing IndexedDB progress remain compatible.

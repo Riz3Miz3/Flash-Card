@@ -159,12 +159,23 @@ body.studying .row .btn{
 .studyModeLabel{font-size:10px;color:#fbbf24;margin-inline-start:6px}
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
+
+/* Complete 1.1 — clickable review category filters */
+button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
+button.pill:active{transform:scale(.98)}
+button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
+.reviewListRow{background:#18243d;border:1px solid #2a3a58;border-radius:14px;padding:11px;margin:7px 0;cursor:pointer}
+.reviewListRow:active{transform:scale(.995)}
+.reviewListFront{font-weight:800;white-space:pre-wrap}
+.reviewListBack{font-size:12px;color:#aab8d5;margin-top:5px;white-space:pre-wrap}
+.reviewListMeta{font-size:10px;color:#7f91ae;margin-top:6px}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.0</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -202,7 +213,7 @@ body.studying .row .btn{
    <div class="stats"><span><span id="studyTitle"></span><span id="studyModeLabel" class="studyModeLabel"></span></span><b id="count"></b></div>
    <select id="lessonSelect"></select>
    <div class="summary">
-    <div class="pill"><strong id="easyN">۰</strong>آسان</div><div class="pill"><strong id="goodN">۰</strong>خوب</div><div class="pill"><strong id="hardN">۰</strong>سخت</div><div class="pill"><strong id="againN">۰</strong>دوباره</div><div class="pill"><strong id="unseenN">۰</strong>جدید</div>
+    <button class="pill reviewFilter" data-filter="easy"><strong id="easyN">۰</strong>آسان</button><button class="pill reviewFilter" data-filter="good"><strong id="goodN">۰</strong>خوب</button><button class="pill reviewFilter" data-filter="hard"><strong id="hardN">۰</strong>سخت</button><button class="pill reviewFilter" data-filter="again"><strong id="againN">۰</strong>دوباره</button><button class="pill reviewFilter" data-filter="unseen"><strong id="unseenN">۰</strong>جدید</button>
    </div>
    <div class="progress"><div id="bar"></div></div>
    <div class="studyCard">
@@ -224,6 +235,12 @@ body.studying .row .btn{
  </div>
 </section>
 </div>
+
+
+<div id="reviewFilterModal" class="modal"><div class="modalCard">
+  <div class="modalHead"><h2 id="reviewFilterTitle">کارت‌ها</h2><button class="closeBtn" data-close="reviewFilterModal">بستن</button></div>
+  <div id="reviewFilterList"></div>
+</div></div>
 
 <div id="browseModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>مرور و جستجوی کارت‌ها</h2><button class="closeBtn" data-close="browseModal">بستن</button></div><input id="cardSearch" class="searchInput" placeholder="جستجو در سؤال، جواب یا تگ…"><div id="browserList"></div></div></div>
 <div id="statsModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>آمار مطالعه</h2><button class="closeBtn" data-close="statsModal">بستن</button></div><div id="statsContent"></div></div></div>
@@ -559,6 +576,49 @@ $("#backupBtn").onclick=()=>$("#backupModal").classList.add("open");
 $("#saveSettings").onclick=saveSettingsUI;$("#saveCardEdit").onclick=saveEdit;$("#exportBackup").onclick=exportBackup;
 $("#restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{$("#backupStatus").textContent="در حال بازیابی…";await restoreBackup(f);$("#backupStatus").textContent="بازیابی کامل شد ✓"}catch(err){$("#backupStatus").textContent="خطا: "+err.message}e.target.value=""};
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).classList.remove("open"));
+
+
+const REVIEW_LABELS={again:"دوباره",hard:"سخت",good:"خوب",easy:"آسان",unseen:"جدید"};
+async function openReviewCategory(filter){
+  if(!current)return;
+  document.querySelectorAll(".reviewFilter").forEach(x=>x.classList.toggle("active",x.dataset.filter===filter));
+  $("#reviewFilterTitle").textContent=`کارت‌های «${REVIEW_LABELS[filter]||filter}»`;
+  const list=$("#reviewFilterList"); list.innerHTML="";
+  const source=current.cards||[];
+  const matches=source.filter(c=>{
+    const s=(current.review||{})[c.id];
+    return filter==="unseen" ? !["again","hard","good","easy"].includes(s) : s===filter;
+  });
+  if(!matches.length){
+    list.innerHTML='<p class="sub">هنوز کارتی در این دسته نیست.</p>';
+  }else{
+    matches.forEach(c=>{
+      const originalIndex=filtered.findIndex(x=>x.id===c.id);
+      const row=document.createElement("div");row.className="reviewListRow";
+      row.innerHTML=`<div class="reviewListFront">${escapeHtml(c.front)}</div><div class="reviewListBack">${escapeHtml(c.back)}</div><div class="reviewListMeta">${escapeHtml(REVIEW_LABELS[filter]||filter)}</div>`;
+      row.onclick=async()=>{
+        $("#reviewFilterModal").classList.remove("open");
+        // Keep current lesson when possible; otherwise switch to all cards so the selected card can be opened.
+        let inCurrent=filtered.findIndex(x=>x.id===c.id);
+        if(inCurrent<0){
+          $("#lessonSelect").value="all";
+          current.selected="all";
+          apply();
+          inCurrent=filtered.findIndex(x=>x.id===c.id);
+        }
+        if(inCurrent>=0){
+          idx=inCurrent;
+          current.positions[$("#lessonSelect").value]=idx;
+          await persist();
+          render();
+        }
+      };
+      list.appendChild(row);
+    });
+  }
+  $("#reviewFilterModal").classList.add("open");
+}
+document.querySelectorAll(".reviewFilter").forEach(b=>b.onclick=()=>openReviewCategory(b.dataset.filter));
 
 const _oldBack=$("#back").onclick;
 $("#back").onclick=async()=>{studyQueueMode=null;$("#studyModeLabel").textContent="";await _oldBack();dashboard()};
