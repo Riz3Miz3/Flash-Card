@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Complete 1.3 — clickable review category filters */
+/* Cloud Sync 2.1 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Complete 1.3 — library ordering */
+/* Cloud Sync 2.1 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -184,18 +184,39 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard.dragOver{outline:2px solid #fbbf24;outline-offset:2px}
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
+
+/* Cloud Sync 2.1 */
+#cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
+.cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
+.cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
+#accountBtn{border:1px solid #334563;background:#202c47;color:#fff;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800}
+#loginGate{position:fixed;inset:0;z-index:1000;background:#080e1c;display:none;align-items:center;justify-content:center;padding:20px}
+#loginGate.open{display:flex}
+.loginCard{width:min(420px,100%);background:#111a2e;border:1px solid #2b3b59;border-radius:24px;padding:20px;box-shadow:0 20px 70px #0008}
+.loginLogo{font-size:40px;text-align:center}.loginCard h2{text-align:center;margin:6px 0 4px;font-size:23px}
+.loginCard p{text-align:center;color:#94a3b8;font-size:12px;margin:0 0 16px;line-height:1.7}
+.loginUser{background:#18243d;border:1px solid #344562;border-radius:13px;padding:12px;margin:6px 0;color:#fff;font-size:15px}
+.loginInput{width:100%;background:#202c47;color:#fff;border:1px solid #344562;border-radius:13px;padding:12px;margin:6px 0;font-size:15px}
+.loginBtn{width:100%;margin-top:8px}
+#loginStatus{font-size:11px;text-align:center;margin-top:10px;color:#fda4af;min-height:16px}
+.syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.3</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
 
 <section id="libraryView" class="panel">
  <div class="libraryHead"><h2>کتابخانه</h2><span id="libraryCount" class="sub"></span></div>
+ <div id="cloudBar">
+   <button id="accountBtn">Tulipa</button>
+   <span id="cloudChip" class="cloudChip">☁️ آماده</span>
+ </div>
  <div class="librarySortRow">
    <span class="sub">ترتیب مجموعه‌ها</span>
    <select id="librarySort">
@@ -208,7 +229,6 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
    <button class="toolBtn" id="todayBtn">امروز</button>
    <button class="toolBtn" id="browseBtn">مرور کارت‌ها</button>
    <button class="toolBtn" id="statsBtn">آمار</button>
-   <button class="toolBtn" id="backupBtn">پشتیبان</button>
    <button class="toolBtn" id="settingsBtn">تنظیمات</button>
  </div>
  <div id="todayBox" class="todayBox">
@@ -261,6 +281,26 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 </div>
 
 
+
+<div id="loginGate">
+  <div class="loginCard">
+    <div class="loginLogo">🌸</div>
+    <h2>فلش‌کارت‌های سمانه</h2>
+    <p>فقط یک‌بار روی هر دستگاه وارد حساب شو. بعد از آن ورود روی همان iPhone یا iPad ذخیره می‌شود.</p>
+    <div class="loginUser">نام کاربری: <b>Tulipa</b></div>
+    <input id="loginPassword" class="loginInput" type="password" autocomplete="current-password" placeholder="رمز عبور">
+    <button id="loginBtn" class="btn primary loginBtn">ورود</button>
+    <div id="loginStatus"></div>
+  </div>
+</div>
+
+<div id="accountModal" class="modal"><div class="modalCard">
+  <div class="modalHead"><h2>حساب Tulipa</h2><button class="closeBtn" data-close="accountModal">بستن</button></div>
+  <div id="accountInfo" class="syncInfo">Cloud Sync فعال است.</div>
+  <button id="syncNowBtn" class="btn primary" style="width:100%;margin-bottom:8px">همگام‌سازی الآن</button>
+  <button id="logoutBtn" class="btn danger" style="width:100%">خروج از حساب</button>
+</div></div>
+
 <div id="reviewFilterModal" class="modal"><div class="modalCard">
   <div class="modalHead"><h2 id="reviewFilterTitle">کارت‌ها</h2><button class="closeBtn" data-close="reviewFilterModal">بستن</button></div>
   <div id="reviewFilterList"></div>
@@ -288,10 +328,19 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fzstd@0.1.1/umd/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=s=>document.querySelector(s), td=new TextDecoder("utf-8");
 const FD=["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"], fa=n=>String(n).replace(/\d/g,d=>FD[+d]);
 let current=null, zip=null, mediaMap={}, filtered=[], idx=0;
+const SUPABASE_URL="https://hvwebsexxdwmwfbyuued.supabase.co";
+const SUPABASE_KEY="sb_publishable_cRZiT5ZGPPnrw_KQUuSbUA_jx34RyCu";
+const LOGIN_EMAIL="samaneh@tulipa.app";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+ auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
+let cloudUser=null, cloudSyncing=false, cloudPulling=false, cloudTimer=null, realtimeChannel=null;
+
 const clean=s=>(s||"").replace(/\[sound:[^\]]+\]/g,"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").trim();
 const sounds=s=>[...(s||"").matchAll(/\[sound:([^\]]+)\]/g)].map(x=>x[1]);
 const zstd=u=>u&&u[0]===0x28&&u[1]===0xB5&&u[2]===0x2F&&u[3]===0xFD?window.fzstd.decompress(u):u;
@@ -330,9 +379,9 @@ async function importFile(file){
   let parsed=await parseAPKG(file), libs=await library();
   let id="d_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
   let title=file.name.replace(/\.(apkg|colpkg)$/i,"").replace(/\(\+?audio\)/ig,"").trim();
-  let item={id,title,fileName:file.name,total:parsed.cards.length,created:Date.now(),manualOrder:libs.length,review:{},srs:{},positions:{all:0},selected:"all",decks:parsed.decks};
+  let item={id,title,fileName:file.name,total:parsed.cards.length,created:Date.now(),localUpdatedAt:Date.now(),manualOrder:libs.length,review:{},srs:{},positions:{all:0},selected:"all",decks:parsed.decks};
   await set("blob:"+id,file); await set("cards:"+id,parsed.cards); await set("media:"+id,parsed.mediaMap);
-  libs.unshift(item);await saveLibrary(libs);$("#status").textContent="";await renderLibrary();toast("به کتابخانه اضافه شد ✓");
+  libs.unshift(item);await saveLibrary(libs);await markLocalDirty();scheduleCloudSync();$("#status").textContent="";await renderLibrary();toast("به کتابخانه اضافه شد ✓");
  }catch(e){console.error(e);$("#status").textContent="خطا: "+e.message}
 }
 async function renderLibrary(){
@@ -365,7 +414,7 @@ async function renderLibrary(){
     if(confirm(`«${d.title}» از کتابخانه حذف شود؟`)){
       let a=await library();a=a.filter(x=>x.id!==d.id);
       await saveLibrary(a);await del("blob:"+d.id);await del("cards:"+d.id);await del("media:"+d.id);
-      await renderLibrary();await dashboard()
+      await markLocalDirty();scheduleCloudSync();await renderLibrary();await dashboard()
     }
   };
 
@@ -413,7 +462,7 @@ async function reorderManual(fromId,toId){
  if(from<0||to<0)return;
  let [moved]=libs.splice(from,1);libs.splice(to,0,moved);
  libs.forEach((d,i)=>d.manualOrder=i);
- await saveLibrary(libs)
+ await saveLibrary(libs);await markLocalDirty();scheduleCloudSync()
 }
 async function openDeck(id){
  let libs=await library();current=libs.find(x=>x.id===id);if(!current)return;
@@ -425,7 +474,10 @@ async function openDeck(id){
 }
 function apply(){let v=$("#lessonSelect").value;filtered=v==="all"?current.cards:current.cards.filter(c=>c.did===v);idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
 async function persist(){
- let libs=await library(),i=libs.findIndex(x=>x.id===current.id);if(i>=0){let keep={...current};delete keep.cards;libs[i]=keep;await saveLibrary(libs)}
+ let libs=await library(),i=libs.findIndex(x=>x.id===current.id);
+ if(i>=0){let keep={...current};delete keep.cards;keep.localUpdatedAt=Date.now();libs[i]=keep;await saveLibrary(libs)}
+ await markLocalDirty();
+ scheduleCloudSync()
 }
 function summary(){let n={again:0,hard:0,good:0,easy:0},seen=0;filtered.forEach(c=>{let s=(current.review||{})[c.id];if(n[s]!=null){n[s]++;seen++}});$("#againN").textContent=fa(n.again);$("#hardN").textContent=fa(n.hard);$("#goodN").textContent=fa(n.good);$("#easyN").textContent=fa(n.easy);$("#unseenN").textContent=fa(filtered.length-seen)}
 async function renderAudio(c){let box=$("#audio");box.innerHTML="";for(const n of c.sounds){let k=Object.keys(mediaMap).find(x=>mediaMap[x]===n);if(k!=null&&zip.file(k)){try{let b=zstd(await zip.file(k).async("uint8array")),a=document.createElement("audio");a.controls=true;a.src=URL.createObjectURL(new Blob([b],{type:mime(n)}));box.appendChild(a)}catch(e){}}}}
@@ -630,7 +682,7 @@ async function showBrowser(q=""){
   let row=document.createElement("div");row.className="browserRow";
   row.innerHTML=`<div class="browserFront">${escapeHtml(c.front)}</div><div class="browserBack">${escapeHtml(c.back)}</div><div class="browserMeta">${escapeHtml(d.title)} ${c.suspended?"• تعلیق‌شده":""}</div><div>${(c.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div><div class="browserActions"><button class="toolBtn editC">ویرایش</button><button class="toolBtn suspendC">${c.suspended?"فعال‌کردن":"تعلیق"}</button></div>`;
   row.querySelector(".editC").onclick=()=>editCard(d.id,c.id);
-  row.querySelector(".suspendC").onclick=async()=>{c.suspended=!c.suspended;let cards=await get("cards:"+d.id),i=cards.findIndex(x=>x.id===c.id);cards[i]=c;await set("cards:"+d.id,cards);showBrowser($("#cardSearch").value);dashboard()};
+  row.querySelector(".suspendC").onclick=async()=>{c.suspended=!c.suspended;c.localUpdatedAt=Date.now();let cards=await get("cards:"+d.id),i=cards.findIndex(x=>x.id===c.id);cards[i]=c;await set("cards:"+d.id,cards);await markLocalDirty();scheduleCloudSync();showBrowser($("#cardSearch").value);dashboard()};
   box.appendChild(row)
  }
  if(!shown)box.innerHTML='<p class="sub">کارتی پیدا نشد.</p>'
@@ -642,8 +694,8 @@ async function editCard(deckId,cardId){
 }
 async function saveEdit(){
  if(!editCardId)return;let cards=await get("cards:"+editCardId.deckId),i=cards.findIndex(x=>x.id===editCardId.cardId);if(i<0)return;
- cards[i].front=$("#editFront").value.trim();cards[i].back=$("#editBack").value.trim();cards[i].tags=$("#editTags").value.trim().split(/\s+/).filter(Boolean);
- await set("cards:"+editCardId.deckId,cards);$("#editModal").classList.remove("open");showBrowser($("#cardSearch").value);toast("کارت ذخیره شد ✓")
+ cards[i].front=$("#editFront").value.trim();cards[i].back=$("#editBack").value.trim();cards[i].tags=$("#editTags").value.trim().split(/\s+/).filter(Boolean);cards[i].localUpdatedAt=Date.now();
+ await set("cards:"+editCardId.deckId,cards);await markLocalDirty();scheduleCloudSync();$("#editModal").classList.remove("open");showBrowser($("#cardSearch").value);toast("کارت ذخیره شد ✓")
 }
 async function showStats(){
  let libs=await library(),hist=[];libs.forEach(d=>(d.history||[]).forEach(x=>hist.push(x)));
@@ -668,7 +720,7 @@ async function restoreBackup(file){
  await migrateAll();await renderLibrary();await dashboard()
 }
 async function loadSettingsUI(){let s=await appSettings();$("#dailyNew").value=s.dailyNew;$("#dailyReview").value=s.dailyReview;$("#retention").value=Math.round(s.retention*100)}
-async function saveSettingsUI(){let s={dailyNew:+$("#dailyNew").value||20,dailyReview:+$("#dailyReview").value||200,retention:(+$("#retention").value||90)/100};await set("settings",s);$("#settingsModal").classList.remove("open");toast("تنظیمات ذخیره شد ✓")}
+async function saveSettingsUI(){let s={dailyNew:+$("#dailyNew").value||20,dailyReview:+$("#dailyReview").value||200,retention:(+$("#retention").value||90)/100};await set("settings",s);await markLocalDirty();scheduleCloudSync();$("#settingsModal").classList.remove("open");toast("تنظیمات ذخیره شد ✓")}
 
 // Wrap existing mark() so history is durable without changing old progress.
 const _completeOldMark=mark;
@@ -679,14 +731,13 @@ mark=async function(rating){
  dashboard()
 };
 
-$("#librarySort").onchange=async e=>{await set("librarySort",e.target.value);await renderLibrary()};
+$("#librarySort").onchange=async e=>{await set("librarySort",e.target.value);await markLocalDirty();scheduleCloudSync();await renderLibrary()};
 $("#todayBtn").onclick=openToday;
 $("#startTodayBtn").onclick=openToday;
 $("#browseBtn").onclick=()=>{$("#browseModal").classList.add("open");showBrowser()};
 $("#cardSearch").oninput=e=>showBrowser(e.target.value);
 $("#statsBtn").onclick=async()=>{$("#statsModal").classList.add("open");await showStats()};
 $("#settingsBtn").onclick=async()=>{$("#settingsModal").classList.add("open");await loadSettingsUI()};
-$("#backupBtn").onclick=()=>$("#backupModal").classList.add("open");
 $("#saveSettings").onclick=saveSettingsUI;$("#saveCardEdit").onclick=saveEdit;$("#exportBackup").onclick=exportBackup;
 $("#restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{$("#backupStatus").textContent="در حال بازیابی…";await restoreBackup(f);$("#backupStatus").textContent="بازیابی کامل شد ✓"}catch(err){$("#backupStatus").textContent="خطا: "+err.message}e.target.value=""};
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).classList.remove("open"));
@@ -741,6 +792,168 @@ const _oldBack=$("#back").onclick;
 $("#back").onclick=async()=>{studyQueueMode=null;$("#studyModeLabel").textContent="";await _oldBack();dashboard()};
 
 (async()=>{await migrateAll();await dashboard()})();
+
+
+// ============================================================
+// Cloud Sync 2.1 — Local-first snapshot sync
+// ============================================================
+function setCloudStatus(text,kind=""){
+ const x=$("#cloudChip");if(!x)return;x.className="cloudChip "+kind;x.textContent=text
+}
+async function markLocalDirty(){await set("lastLocalChange",Date.now())}
+function scheduleCloudSync(delay=900){
+ if(!cloudUser||cloudPulling)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>syncCloud(false),delay)
+}
+async function buildSnapshot(){
+ const libs=await library(),collections=[];
+ for(const d of libs){
+   collections.push({
+     meta:{...d},
+     cards:(await get("cards:"+d.id))||[],
+     media:(await get("media:"+d.id))||{}
+   })
+ }
+ return{
+   schema:1,
+   updatedAt:Date.now(),
+   librarySort:(await get("librarySort"))||"import_asc",
+   settings:await appSettings(),
+   collections
+ }
+}
+async function ensureApkgInCloud(d){
+ const blob=await get("blob:"+d.id);if(!blob||!cloudUser)return null;
+ const path=`${cloudUser.id}/${d.id}.apkg`;
+ const {error}=await sb.storage.from("flashcard-apkg").upload(path,blob,{upsert:true,contentType:"application/octet-stream"});
+ if(error)throw error;
+ return path
+}
+async function pushSnapshot(){
+ const snap=await buildSnapshot();
+ for(const x of snap.collections){
+   try{x.meta.apkgPath=await ensureApkgInCloud(x.meta)}catch(e){console.warn("APKG upload",e)}
+ }
+ snap.updatedAt=Date.now();
+ const {error}=await sb.from("flashcard_settings").upsert({
+   user_id:cloudUser.id,
+   daily_new:snap.settings.dailyNew,
+   daily_review:snap.settings.dailyReview,
+   desired_retention:snap.settings.retention,
+   library_sort:snap.librarySort,
+   settings:{flash_sync_snapshot:snap}
+ },{onConflict:"user_id"});
+ if(error)throw error;
+ await set("lastLocalChange",snap.updatedAt);
+ await set("lastCloudSync",snap.updatedAt)
+}
+async function pullSnapshot(){
+ if(!cloudUser)return false;
+ const {data,error}=await sb.from("flashcard_settings").select("*").eq("user_id",cloudUser.id).maybeSingle();
+ if(error)throw error;
+ const snap=data?.settings?.flash_sync_snapshot;
+ if(!snap)return false;
+
+ cloudPulling=true;
+ try{
+   const localChange=(await get("lastLocalChange"))||0;
+   if(localChange>Number(snap.updatedAt||0))return false;
+
+   const libs=[];
+   for(const x of (snap.collections||[])){
+     const d={...x.meta};delete d.apkgPath;
+     libs.push(d);
+     await set("cards:"+d.id,x.cards||[]);
+     await set("media:"+d.id,x.media||{});
+
+     // Download APKG only when this device does not already have it.
+     const existing=await get("blob:"+d.id);
+     if(!existing && x.meta?.apkgPath){
+       const {data:blob,error:de}=await sb.storage.from("flashcard-apkg").download(x.meta.apkgPath);
+       if(!de&&blob)await set("blob:"+d.id,blob)
+     }
+   }
+   await saveLibrary(libs);
+   await set("librarySort",snap.librarySort||"import_asc");
+   await set("settings",snap.settings||{dailyNew:20,dailyReview:200,retention:.90});
+   await set("lastLocalChange",Number(snap.updatedAt)||Date.now());
+   await set("lastCloudSync",Number(snap.updatedAt)||Date.now());
+   await migrateAll();await renderLibrary();await dashboard();
+   return true
+ } finally {cloudPulling=false}
+}
+async function cloudSnapshotTime(){
+ const {data,error}=await sb.from("flashcard_settings").select("settings").eq("user_id",cloudUser.id).maybeSingle();
+ if(error)throw error;
+ return Number(data?.settings?.flash_sync_snapshot?.updatedAt||0)
+}
+async function syncCloud(manual=true){
+ if(!cloudUser||cloudSyncing)return;
+ cloudSyncing=true;setCloudStatus("☁️ در حال همگام‌سازی…","syncing");
+ try{
+   const cloudTime=await cloudSnapshotTime();
+   const localTime=(await get("lastLocalChange"))||0;
+   const libs=await library();
+
+   if(!cloudTime){
+     // First device: preserve existing local progress by uploading it first.
+     await pushSnapshot()
+   }else if(!libs.length){
+     // New/empty device: cloud wins.
+     await pullSnapshot()
+   }else if(localTime>cloudTime){
+     await pushSnapshot()
+   }else if(cloudTime>localTime){
+     await pullSnapshot()
+   }else{
+     // Equal timestamps: nothing destructive, but make sure cloud is reachable.
+     await set("lastCloudSync",Date.now())
+   }
+
+   setCloudStatus("☁️ همگام شد ✓","ok");
+   if(manual)toast("همگام‌سازی کامل شد ✓")
+ }catch(e){
+   console.error(e);setCloudStatus("☁️ خطای Sync","err");
+   if(manual)toast("خطای همگام‌سازی: "+(e.message||e))
+ }finally{cloudSyncing=false}
+}
+function startRealtime(){
+ if(realtimeChannel){try{sb.removeChannel(realtimeChannel)}catch(_){}}
+ realtimeChannel=sb.channel("tulipa-flash-sync")
+   .on("postgres_changes",{event:"UPDATE",schema:"public",table:"flashcard_settings",filter:`user_id=eq.${cloudUser.id}`},async()=>{
+      if(cloudSyncing||cloudPulling)return;
+      try{setCloudStatus("☁️ دریافت تغییرات…","syncing");await pullSnapshot();setCloudStatus("☁️ همگام شد ✓","ok")}catch(e){console.error(e)}
+   }).subscribe()
+}
+async function handleSession(session){
+ cloudUser=session?.user||null;
+ if(!cloudUser){
+   $("#loginGate").classList.add("open");setCloudStatus("☁️ وارد نشده","");
+   return
+ }
+ $("#loginGate").classList.remove("open");
+ $("#accountInfo").textContent="حساب Tulipa فعال است. ورود روی این دستگاه ذخیره شده و اطلاعات با دستگاه‌های دیگر Sync می‌شود.";
+ startRealtime();await syncCloud(false)
+}
+$("#loginBtn").onclick=async()=>{
+ const password=$("#loginPassword").value;
+ $("#loginStatus").textContent="در حال ورود…";
+ const {data,error}=await sb.auth.signInWithPassword({email:LOGIN_EMAIL,password});
+ if(error){$("#loginStatus").textContent="نام کاربری یا رمز عبور درست نیست.";return}
+ $("#loginStatus").textContent="";await handleSession(data.session)
+};
+$("#accountBtn").onclick=()=>$("#accountModal").classList.add("open");
+$("#syncNowBtn").onclick=()=>syncCloud(true);
+$("#logoutBtn").onclick=async()=>{
+ await sb.auth.signOut();cloudUser=null;$("#accountModal").classList.remove("open");
+ $("#loginPassword").value="";$("#loginGate").classList.add("open");setCloudStatus("☁️ وارد نشده","")
+};
+
+(async()=>{
+ const {data:{session}}=await sb.auth.getSession();
+ await handleSession(session)
+})();
+window.addEventListener("online",()=>scheduleCloudSync(250));
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&cloudUser)syncCloud(false)});
 
 renderLibrary();
 </script>
