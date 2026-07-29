@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Cloud Sync 2.4 — clickable review category filters */
+/* Cloud Sync 2.4.1 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Cloud Sync 2.4 — library ordering */
+/* Cloud Sync 2.4.1 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -185,7 +185,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
 
-/* Cloud Sync 2.4 */
+/* Cloud Sync 2.4.1 */
 #cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
 .cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
 .cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
@@ -202,7 +202,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
 
 
-/* Cloud Sync 2.4 — global card status */
+/* Cloud Sync 2.4.1 — global card status */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;position:sticky;top:0;background:#111a2e;padding:2px 0 8px;z-index:2}
 .statusTab{border:1px solid #334563;background:#202c47;color:#fff;border-radius:12px;padding:10px 4px;font:inherit;font-size:12px;font-weight:800}
 .statusTab b{display:block;margin-top:4px;color:#aab8d5;font-size:11px}.statusTab.active{background:#ffc300;color:#111827;border-color:#ffc300}.statusTab.active b{color:#111827}
@@ -215,7 +215,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 @media(max-width:390px){.statusTabs{gap:4px}.statusTab{font-size:10px;padding:8px 2px}}
 
 
-/* Cloud Sync 2.4 — interaction + progress fixes */
+/* Cloud Sync 2.4.1 — interaction + progress fixes */
 .todayStat.dashboardFilter{cursor:pointer;border:1px solid transparent;transition:transform .12s ease,border-color .12s ease,background .12s ease;user-select:none;-webkit-user-select:none}
 .todayStat.dashboardFilter:active{transform:scale(.975);border-color:#fbbf24;background:#263654}
 .todayStat.dashboardFilter::after{content:"مشاهده";display:block;font-size:8px;color:#7183a4;margin-top:3px}
@@ -237,7 +237,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.4</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.4.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -453,7 +453,7 @@ async function renderLibrary(){
   let studied=new Set([...Object.keys(d.seen||{}),...Object.keys(d.review||{}),...Object.entries(d.srs||{}).filter(([_,s])=>(s?.reps||0)>0).map(([id])=>id)]).size,pct=d.total?Math.round(studied/d.total*100):0;
   let el=document.createElement("div");el.className="deckCard";el.dataset.deckId=d.id;
   el.draggable=pref==="manual";
-  el.innerHTML=`${pref==="manual"?'<button class="dragHandle" aria-label="جابجایی">↕</button>':""}<div class="deckTop"><div><div class="deckTitle">${d.title}</div><div class="deckMeta">${fa(d.total)} کارت · ${fa(Object.keys(d.decks||{}).length)} درس · ${fa(studied)} مطالعه‌شده</div></div><div class="ring">${fa(pct)}٪</div></div><div class="miniProgress"><div style="width:${pct}%"></div></div><div class="cardActions"><button class="btn primary open">ادامه مطالعه</button><button class="btn danger remove">حذف</button></div>`;
+  el.innerHTML=`${pref==="manual"?'<button class="dragHandle" aria-label="جابجایی">↕</button>':""}<div class="deckTop"><div><div class="deckTitle">${d.title}</div><div class="deckMeta">${fa(d.total)} کارت · ${fa(Object.keys(d.decks||{}).length)} درس · ${fa(studied)} مطالعه‌شده</div></div><div class="ring">${fa(pct)}٪</div></div><div class="miniProgress"><div style="width:${pct}%"></div></div><div class="cardActions"><button class="btn primary open">${studied>0?"ادامه مطالعه":"شروع مطالعه"}</button><button class="btn danger remove">حذف</button></div>`;
 
   el.querySelector(".open").onclick=e=>{e.stopPropagation();openDeck(d.id)};
   el.onclick=e=>{if(!e.target.closest(".dragHandle")&&!e.target.closest(".remove"))openDeck(d.id)};
@@ -1084,7 +1084,7 @@ $("#back").onclick=async()=>{studyQueueMode=null;$("#studyModeLabel").textConten
 
 
 // ============================================================
-// Cloud Sync 2.4 — Local-first snapshot sync
+// Cloud Sync 2.4.1 — Local-first snapshot sync
 // ============================================================
 function setCloudStatus(text,kind=""){
  const x=$("#cloudChip");if(!x)return;x.className="cloudChip "+kind;x.textContent=text
