@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Complete 1.1 — clickable review category filters */
+/* Complete 1.2 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -170,12 +170,16 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .reviewListBack{font-size:12px;color:#aab8d5;margin-top:5px;white-space:pre-wrap}
 .reviewListMeta{font-size:10px;color:#7f91ae;margin-top:6px}
 
+
+.todayStart{width:100%;margin-top:10px;min-height:44px}
+.todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.1</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.2</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -194,9 +198,11 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
    <div class="todayGrid">
     <div class="todayStat"><strong id="dueN">۰</strong>موعد مرور</div>
     <div class="todayStat"><strong id="learningN">۰</strong>در حال یادگیری</div>
-    <div class="todayStat"><strong id="newN">۰</strong>جدید</div>
+    <div class="todayStat"><strong id="newN">۰</strong>جدید امروز</div>
     <div class="todayStat"><strong id="todayReviewsN">۰</strong>مرور امروز</div>
    </div>
+   <button id="startTodayBtn" class="btn primary todayStart">شروع مطالعه امروز — <span id="todayTotalN">۰</span> کارت</button>
+   <div id="newRemaining" class="todayRemaining">۰ کارت جدید باقی مانده</div>
  </div>
  <div id="libraryEmpty">
    <div class="emptyIcon">📚</div><h2>هنوز فلش‌کارتی نداری</h2>
@@ -484,11 +490,27 @@ async function allCardsWithDeck(){
  return out
 }
 async function dashboard(){
- let all=await allCardsWithDeck(),libs=await library(),now=Date.now(),due=0,learning=0,newc=0,reviews=0;
- all.forEach(({d,c})=>{let s=stateOf(d,c,now);if(s==="new")newc++;else if(s==="learning")learning++;else if(s==="due")due++});
+ let all=await allCardsWithDeck(),libs=await library(),settings=await appSettings(),now=Date.now(),due=0,learningDue=0,totalNew=0,reviews=0;
+ all.forEach(({d,c})=>{
+   let s=stateOf(d,c,now);
+   if(s==="new")totalNew++;
+   else if(s==="due")due++;
+   else if(s==="learning" && (d.srs||{})[c.id]?.due<=now)learningDue++;
+ });
  let start=new Date();start.setHours(0,0,0,0);
  libs.forEach(d=>(d.history||[]).forEach(x=>{if(x.at>=start.getTime())reviews++}));
- $("#dueN").textContent=fa(due);$("#learningN").textContent=fa(learning);$("#newN").textContent=fa(newc);$("#todayReviewsN").textContent=fa(reviews);
+ // Daily-new is a global daily allowance, not the entire unseen library.
+ let newToday=Math.min(totalNew,Math.max(0,settings.dailyNew));
+ let reviewToday=Math.min(due+learningDue,Math.max(0,settings.dailyReview));
+ let totalToday=reviewToday+newToday;
+ $("#dueN").textContent=fa(due);
+ $("#learningN").textContent=fa(learningDue);
+ $("#newN").textContent=fa(newToday);
+ $("#todayReviewsN").textContent=fa(reviews);
+ $("#todayTotalN").textContent=fa(totalToday);
+ $("#newRemaining").textContent=fa(Math.max(0,totalNew-newToday))+" کارت جدید باقی مانده";
+ $("#startTodayBtn").disabled=totalToday===0;
+ $("#startTodayBtn").textContent=totalToday?("شروع مطالعه امروز — "+fa(totalToday)+" کارت"):"برنامه امروز تمام شد ✓";
  $("#streak").textContent="🔥 "+fa(calcStreak(libs))+" روز"
 }
 function calcStreak(libs){
@@ -499,14 +521,17 @@ function calcStreak(libs){
 }
 async function openToday(){
  let libs=await library(),settings=await appSettings(),now=Date.now(),queue=[];
+ let reviewLeft=Math.max(0,settings.dailyReview),newLeft=Math.max(0,settings.dailyNew);
  for(let d of libs){
   let cards=(await get("cards:"+d.id))||[];
-  let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))).slice(0,settings.dailyReview);
-  let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,settings.dailyNew);
-  if(due.length||fresh.length)queue.push({d,cards:[...due,...fresh]})
+  let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))&&((d.srs||{})[c.id]?.due||0)<=now).slice(0,reviewLeft);
+  reviewLeft-=due.length;
+  let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,newLeft);
+  newLeft-=fresh.length;
+  if(due.length||fresh.length)queue.push({d,cards:[...due,...fresh]});
+  if(reviewLeft<=0&&newLeft<=0)break;
  }
  if(!queue.length){toast("برای امروز کارتی باقی نمانده ✓");return}
- // Today studies one collection at a time to preserve media/audio loading.
  let q=queue[0];await openDeck(q.d.id);filtered=q.cards;idx=0;studyQueueMode="today";$("#studyModeLabel").textContent="• امروز";render()
 }
 async function showBrowser(q=""){
@@ -568,6 +593,7 @@ mark=async function(rating){
 };
 
 $("#todayBtn").onclick=openToday;
+$("#startTodayBtn").onclick=openToday;
 $("#browseBtn").onclick=()=>{$("#browseModal").classList.add("open");showBrowser()};
 $("#cardSearch").oninput=e=>showBrowser(e.target.value);
 $("#statsBtn").onclick=async()=>{$("#statsModal").classList.add("open");await showStats()};
@@ -576,6 +602,9 @@ $("#backupBtn").onclick=()=>$("#backupModal").classList.add("open");
 $("#saveSettings").onclick=saveSettingsUI;$("#saveCardEdit").onclick=saveEdit;$("#exportBackup").onclick=exportBackup;
 $("#restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{$("#backupStatus").textContent="در حال بازیابی…";await restoreBackup(f);$("#backupStatus").textContent="بازیابی کامل شد ✓"}catch(err){$("#backupStatus").textContent="خطا: "+err.message}e.target.value=""};
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).classList.remove("open"));
+document.querySelectorAll(".modal").forEach(modal=>{
+ modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("open")});
+});
 
 
 const REVIEW_LABELS={again:"دوباره",hard:"سخت",good:"خوب",easy:"آسان",unseen:"جدید"};
