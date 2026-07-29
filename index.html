@@ -133,18 +133,60 @@ body.studying .row .btn{
 .reviewBtn:active{transform:scale(.97)}
 @media(max-width:390px){.review4{gap:4px}.reviewBtn{font-size:11px;min-height:36px}.reviewTime{font-size:9px}}
 @media(max-height:700px){.reviewBtn{min-height:31px;padding:5px 2px;font-size:10px}.reviewTime{font-size:8px}}
+
+/* Complete 1.0 */
+.topTools{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+.toolBtn{border:1px solid #334563;background:#18243d;color:#fff;border-radius:12px;padding:9px 11px;font-weight:750;font-size:12px}
+.todayBox{background:linear-gradient(145deg,#18243d,#111a2e);border:1px solid #2c3d5d;border-radius:20px;padding:14px;margin-bottom:12px}
+.todayTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.todayTitle b{font-size:17px}.todayGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.todayStat{background:#202c47;border-radius:11px;padding:8px 3px;text-align:center;font-size:9px;color:#9fb0cd}
+.todayStat strong{display:block;color:#fff;font-size:16px;margin-bottom:2px}
+.streak{color:#fbbf24;font-weight:850}
+.modal{position:fixed;inset:0;background:#050914e8;z-index:200;display:none;padding:calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px);overflow:auto}
+.modal.open{display:block}.modalCard{max-width:760px;margin:auto;background:#111a2e;border:1px solid #2b3b59;border-radius:22px;padding:15px;min-height:180px}
+.modalHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.modalHead h2{margin:0;font-size:19px}
+.closeBtn{border:0;background:#202c47;color:#fff;border-radius:11px;padding:8px 11px}
+.searchInput,.editInput,.settingsInput{width:100%;background:#202c47;color:#fff;border:1px solid #344562;border-radius:12px;padding:11px;margin:5px 0;font-size:14px}
+.browserRow{background:#18243d;border:1px solid #2a3a58;border-radius:14px;padding:11px;margin:7px 0}
+.browserFront{font-weight:800;white-space:pre-wrap}.browserBack{font-size:12px;color:#aab8d5;margin-top:5px;white-space:pre-wrap}
+.browserMeta{font-size:10px;color:#7f91ae;margin-top:6px}.browserActions{display:flex;gap:6px;margin-top:8px}.browserActions button{flex:1}
+.tag{display:inline-block;background:#263654;border-radius:99px;padding:3px 7px;margin:2px;font-size:9px;color:#c7d2e7}
+.chartBar{display:flex;align-items:flex-end;gap:5px;height:120px;margin:15px 0;border-bottom:1px solid #33415d}
+.chartCol{flex:1;background:#405274;border-radius:5px 5px 0 0;min-height:2px;position:relative}.chartCol span{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;color:#91a1bc}
+.settingRow{background:#18243d;border-radius:13px;padding:11px;margin:7px 0}.settingRow label{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}
+.dueBadge{display:inline-block;border-radius:99px;padding:3px 7px;background:#263654;color:#cbd5e1;font-size:9px;margin-top:6px}
+.studyModeLabel{font-size:10px;color:#fbbf24;margin-inline-start:6px}
+@media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · v5.4</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Complete 1.0</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
 
 <section id="libraryView" class="panel">
  <div class="libraryHead"><h2>کتابخانه</h2><span id="libraryCount" class="sub"></span></div>
+ <div class="topTools">
+   <button class="toolBtn" id="todayBtn">امروز</button>
+   <button class="toolBtn" id="browseBtn">مرور کارت‌ها</button>
+   <button class="toolBtn" id="statsBtn">آمار</button>
+   <button class="toolBtn" id="backupBtn">پشتیبان</button>
+   <button class="toolBtn" id="settingsBtn">تنظیمات</button>
+ </div>
+ <div id="todayBox" class="todayBox">
+   <div class="todayTitle"><b>برنامه امروز</b><span id="streak" class="streak">🔥 ۰ روز</span></div>
+   <div class="todayGrid">
+    <div class="todayStat"><strong id="dueN">۰</strong>موعد مرور</div>
+    <div class="todayStat"><strong id="learningN">۰</strong>در حال یادگیری</div>
+    <div class="todayStat"><strong id="newN">۰</strong>جدید</div>
+    <div class="todayStat"><strong id="todayReviewsN">۰</strong>مرور امروز</div>
+   </div>
+ </div>
  <div id="libraryEmpty">
    <div class="emptyIcon">📚</div><h2>هنوز فلش‌کارتی نداری</h2>
    <p class="sub">یک فایل APKG اضافه کن؛ بعداً هر تعداد مجموعه بخواهی می‌توانی نگه داری.</p>
@@ -157,7 +199,7 @@ body.studying .row .btn{
 <section id="studyView">
  <button id="back" class="btn secondary back">← کتابخانه</button>
  <div class="panel">
-   <div class="stats"><span id="studyTitle"></span><b id="count"></b></div>
+   <div class="stats"><span><span id="studyTitle"></span><span id="studyModeLabel" class="studyModeLabel"></span></span><b id="count"></b></div>
    <select id="lessonSelect"></select>
    <div class="summary">
     <div class="pill"><strong id="easyN">۰</strong>آسان</div><div class="pill"><strong id="goodN">۰</strong>خوب</div><div class="pill"><strong id="hardN">۰</strong>سخت</div><div class="pill"><strong id="againN">۰</strong>دوباره</div><div class="pill"><strong id="unseenN">۰</strong>جدید</div>
@@ -182,6 +224,24 @@ body.studying .row .btn{
  </div>
 </section>
 </div>
+
+<div id="browseModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>مرور و جستجوی کارت‌ها</h2><button class="closeBtn" data-close="browseModal">بستن</button></div><input id="cardSearch" class="searchInput" placeholder="جستجو در سؤال، جواب یا تگ…"><div id="browserList"></div></div></div>
+<div id="statsModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>آمار مطالعه</h2><button class="closeBtn" data-close="statsModal">بستن</button></div><div id="statsContent"></div></div></div>
+<div id="settingsModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>تنظیمات مطالعه</h2><button class="closeBtn" data-close="settingsModal">بستن</button></div>
+<div class="settingRow"><label>کارت جدید روزانه <input id="dailyNew" class="settingsInput" type="number" min="1" max="500"></label></div>
+<div class="settingRow"><label>حداکثر مرور روزانه <input id="dailyReview" class="settingsInput" type="number" min="1" max="2000"></label></div>
+<div class="settingRow"><label>هدف حفظ مطالب (%) <input id="retention" class="settingsInput" type="number" min="70" max="99" step="1"></label></div>
+<button id="saveSettings" class="btn primary" style="width:100%;margin-top:8px">ذخیره تنظیمات</button>
+</div></div>
+<div id="backupModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>پشتیبان‌گیری و بازیابی</h2><button class="closeBtn" data-close="backupModal">بستن</button></div>
+<p class="sub">Backup شامل کتابخانه، APKGها، پیشرفت، زمان‌بندی، آمار و تنظیمات است.</p>
+<div class="row"><button id="exportBackup" class="btn primary">ساخت Backup</button><label class="btn secondary" for="restoreFile">Restore</label><input id="restoreFile" type="file" accept=".json,application/json"></div>
+<div id="backupStatus" class="sub" style="margin-top:10px"></div>
+</div></div>
+<div id="editModal" class="modal"><div class="modalCard"><div class="modalHead"><h2>ویرایش کارت</h2><button class="closeBtn" data-close="editModal">بستن</button></div>
+<textarea id="editFront" class="editInput" rows="5" placeholder="سؤال"></textarea><textarea id="editBack" class="editInput" rows="5" placeholder="جواب"></textarea><input id="editTags" class="editInput" placeholder="تگ‌ها با فاصله"><button id="saveCardEdit" class="btn primary" style="width:100%">ذخیره</button>
+</div></div>
+
 <div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -219,7 +279,7 @@ async function parseAPKG(file){
   try{let r=db.exec("select decks from col"),o=JSON.parse(r[0].values[0][0]);Object.keys(o).forEach(k=>decks[k]=o[k].name)}catch(_){}
  }
  let r=db.exec("select n.id,n.flds,c.did from notes n join cards c on c.nid=n.id group by n.id order by c.id");if(!r.length)throw Error("کارتی پیدا نشد");
- let cards=r[0].values.map(x=>{let f=String(x[1]).split("\x1f"),raw=f.join(" ");return{id:String(x[0]),did:String(x[2]),front:clean(f[0]),back:clean(f[1]||f[0]),sounds:sounds(raw)}});
+ let cards=r[0].values.map(x=>{let f=String(x[1]).split("\x1f"),raw=f.join(" ");return{id:String(x[0]),did:String(x[2]),front:clean(f[0]),back:clean(f[1]||f[0]),sounds:sounds(raw),tags:[],suspended:false}});
  return{cards,decks,mediaMap};
 }
 function shortName(n){let p=(n||"Deck").split("::");return p[p.length-1]}
@@ -260,10 +320,24 @@ async function persist(){
 function summary(){let n={again:0,hard:0,good:0,easy:0},seen=0;filtered.forEach(c=>{let s=(current.review||{})[c.id];if(n[s]!=null){n[s]++;seen++}});$("#againN").textContent=fa(n.again);$("#hardN").textContent=fa(n.hard);$("#goodN").textContent=fa(n.good);$("#easyN").textContent=fa(n.easy);$("#unseenN").textContent=fa(filtered.length-seen)}
 async function renderAudio(c){let box=$("#audio");box.innerHTML="";for(const n of c.sounds){let k=Object.keys(mediaMap).find(x=>mediaMap[x]===n);if(k!=null&&zip.file(k)){try{let b=zstd(await zip.file(k).async("uint8array")),a=document.createElement("audio");a.controls=true;a.src=URL.createObjectURL(new Blob([b],{type:mime(n)}));box.appendChild(a)}catch(e){}}}}
 function fmtDelay(ms){let m=Math.max(1,Math.round(ms/60000));if(m<60)return m+"m";let hr=Math.round(m/60);if(hr<24)return hr+"h";return Math.round(hr/24)+"d"}
-function reviewIntervals(c){current.srs=current.srs||{};let s=current.srs[c.id]||{reps:0,interval:0,ease:2.5};if(!s.reps)return{again:60000,hard:360000,good:600000,easy:432000000};let b=Math.max(600000,s.interval||600000);return{again:60000,hard:Math.max(360000,b*1.2),good:Math.max(600000,b*Math.max(1.3,s.ease||2.5)),easy:Math.max(432000000,b*Math.max(2.5,(s.ease||2.5)+.35))}}
+function reviewIntervals(c){
+ current.srs=current.srs||{};
+ let s=current.srs[c.id]||{reps:0,interval:0,ease:2.5,difficulty:5,stability:0};
+ if(!s.reps)return{again:60000,hard:360000,good:600000,easy:432000000};
+ let retention=.90;
+ let base=Math.max(600000,s.interval||600000);
+ let stability=Math.max(base,s.stability||base);
+ let factor=Math.max(.65,Math.min(1.45,.90/retention));
+ return{
+  again:60000,
+  hard:Math.max(360000,stability*1.2*factor),
+  good:Math.max(600000,stability*Math.max(1.35,s.ease||2.5)*factor),
+  easy:Math.max(432000000,stability*Math.max(2.7,(s.ease||2.5)+.4)*factor)
+ }
+}
 function updateReviewTimes(c){let t=reviewIntervals(c);$("#againTime").textContent=t.again<=60000?"<1m":fmtDelay(t.again);$("#hardTime").textContent=t.hard<=360000?"<6m":fmtDelay(t.hard);$("#goodTime").textContent=t.good<=600000?"<10m":fmtDelay(t.good);$("#easyTime").textContent=fmtDelay(t.easy)}
 function render(){if(!filtered.length)return;let c=filtered[idx];$("#front").textContent=c.front||"(بدون متن)";$("#answer").textContent=c.back||"(بدون جواب)";$("#answer").style.display="none";$("#show").style.display="block";$("#review4").style.display="none";$("#count").textContent=`${fa(idx+1)} از ${fa(filtered.length)}`;$("#bar").style.width=((idx+1)/filtered.length*100)+"%";updateReviewTimes(c);summary();renderAudio(c)}
-async function mark(s){let id=cid(),c=filtered[idx],now=Date.now(),t=reviewIntervals(c);current.review=current.review||{};current.srs=current.srs||{};let o=current.srs[id]||{reps:0,ease:2.5},ease=o.ease||2.5;if(s==="again")ease=Math.max(1.3,ease-.2);if(s==="hard")ease=Math.max(1.3,ease-.1);if(s==="easy")ease=Math.min(3.2,ease+.15);current.review[id]=s;current.srs[id]={reps:(o.reps||0)+1,interval:t[s],due:now+t[s],ease:ease,last:s,lastReviewed:now};let v=$("#lessonSelect").value;idx=(idx+1)%filtered.length;current.positions[v]=idx;await persist();render()}
+async function mark(s){let id=cid(),c=filtered[idx],now=Date.now(),t=reviewIntervals(c);current.review=current.review||{};current.srs=current.srs||{};let o=current.srs[id]||{reps:0,ease:2.5},ease=o.ease||2.5;if(s==="again")ease=Math.max(1.3,ease-.2);if(s==="hard")ease=Math.max(1.3,ease-.1);if(s==="easy")ease=Math.min(3.2,ease+.15);current.review[id]=s;let diff=Math.max(1,Math.min(10,(o.difficulty||5)+(s==="again"?1:s==="hard"?.4:s==="easy"?-.5:-.15)));current.srs[id]={reps:(o.reps||0)+1,interval:t[s],stability:t[s],difficulty:diff,due:now+t[s],ease:ease,last:s,lastReviewed:now};let v=$("#lessonSelect").value;idx=(idx+1)%filtered.length;current.positions[v]=idx;await persist();render()}
 function cid(){return filtered[idx].id}
 $("#file").onchange=e=>{
   let f=e.target.files[0];
@@ -354,6 +428,143 @@ studyCard.addEventListener("pointercancel",finishSwipe);
 
 $("#show").onclick=()=>{$("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid"};
 $("#again").onclick=()=>mark("again");$("#hard").onclick=()=>mark("hard");$("#good").onclick=()=>mark("good");$("#easy").onclick=()=>mark("easy");
+
+// Complete 1.0 migration + study engine. Existing IndexedDB keys are preserved.
+const DAY=86400000;
+let studyQueueMode=null, editCardId=null;
+
+async function appSettings(){
+ return Object.assign({dailyNew:20,dailyReview:200,retention:.90},(await get("settings"))||{})
+}
+async function migrateAll(){
+ let libs=await library(),changed=false;
+ for(let d of libs){
+  if(!d.review){d.review={};changed=true}
+  if(!d.srs){d.srs={};changed=true}
+  if(!d.history){d.history=[];changed=true}
+  if(!d.positions){d.positions={all:0};changed=true}
+  if(!d.selected){d.selected="all";changed=true}
+  let cards=await get("cards:"+d.id);
+  if(cards){
+   let cc=false;
+   cards.forEach(c=>{if(!Array.isArray(c.tags)){c.tags=[];cc=true}if(c.suspended==null){c.suspended=false;cc=true}});
+   if(cc)await set("cards:"+d.id,cards)
+  }
+ }
+ if(changed)await saveLibrary(libs)
+}
+function stateOf(d,c,now=Date.now()){
+ if(c.suspended)return"suspended";
+ let s=(d.srs||{})[c.id];
+ if(!s||!s.reps)return"new";
+ if(s.due<=now)return"due";
+ if((s.interval||0)<DAY)return"learning";
+ return"review"
+}
+async function allCardsWithDeck(){
+ let libs=await library(),out=[];
+ for(let d of libs){let cards=(await get("cards:"+d.id))||[];cards.forEach(c=>out.push({d,c}))}
+ return out
+}
+async function dashboard(){
+ let all=await allCardsWithDeck(),libs=await library(),now=Date.now(),due=0,learning=0,newc=0,reviews=0;
+ all.forEach(({d,c})=>{let s=stateOf(d,c,now);if(s==="new")newc++;else if(s==="learning")learning++;else if(s==="due")due++});
+ let start=new Date();start.setHours(0,0,0,0);
+ libs.forEach(d=>(d.history||[]).forEach(x=>{if(x.at>=start.getTime())reviews++}));
+ $("#dueN").textContent=fa(due);$("#learningN").textContent=fa(learning);$("#newN").textContent=fa(newc);$("#todayReviewsN").textContent=fa(reviews);
+ $("#streak").textContent="🔥 "+fa(calcStreak(libs))+" روز"
+}
+function calcStreak(libs){
+ let days=new Set();libs.forEach(d=>(d.history||[]).forEach(x=>days.add(new Date(x.at).toISOString().slice(0,10))));
+ let n=0,dt=new Date();dt.setHours(12,0,0,0);
+ for(;;){let k=dt.toISOString().slice(0,10);if(days.has(k)){n++;dt=new Date(dt.getTime()-DAY)}else{if(n===0){dt=new Date(dt.getTime()-DAY);let k2=dt.toISOString().slice(0,10);if(days.has(k2)){n++;dt=new Date(dt.getTime()-DAY);continue}}break}}
+ return n
+}
+async function openToday(){
+ let libs=await library(),settings=await appSettings(),now=Date.now(),queue=[];
+ for(let d of libs){
+  let cards=(await get("cards:"+d.id))||[];
+  let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))).slice(0,settings.dailyReview);
+  let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,settings.dailyNew);
+  if(due.length||fresh.length)queue.push({d,cards:[...due,...fresh]})
+ }
+ if(!queue.length){toast("برای امروز کارتی باقی نمانده ✓");return}
+ // Today studies one collection at a time to preserve media/audio loading.
+ let q=queue[0];await openDeck(q.d.id);filtered=q.cards;idx=0;studyQueueMode="today";$("#studyModeLabel").textContent="• امروز";render()
+}
+async function showBrowser(q=""){
+ let all=await allCardsWithDeck(),term=q.trim().toLowerCase(),box=$("#browserList");box.innerHTML="";
+ let shown=0;
+ for(let {d,c} of all){
+  let hay=(c.front+" "+c.back+" "+(c.tags||[]).join(" ")).toLowerCase();
+  if(term&&!hay.includes(term))continue;if(shown++>=150)break;
+  let row=document.createElement("div");row.className="browserRow";
+  row.innerHTML=`<div class="browserFront">${escapeHtml(c.front)}</div><div class="browserBack">${escapeHtml(c.back)}</div><div class="browserMeta">${escapeHtml(d.title)} ${c.suspended?"• تعلیق‌شده":""}</div><div>${(c.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div><div class="browserActions"><button class="toolBtn editC">ویرایش</button><button class="toolBtn suspendC">${c.suspended?"فعال‌کردن":"تعلیق"}</button></div>`;
+  row.querySelector(".editC").onclick=()=>editCard(d.id,c.id);
+  row.querySelector(".suspendC").onclick=async()=>{c.suspended=!c.suspended;let cards=await get("cards:"+d.id),i=cards.findIndex(x=>x.id===c.id);cards[i]=c;await set("cards:"+d.id,cards);showBrowser($("#cardSearch").value);dashboard()};
+  box.appendChild(row)
+ }
+ if(!shown)box.innerHTML='<p class="sub">کارتی پیدا نشد.</p>'
+}
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+async function editCard(deckId,cardId){
+ let cards=await get("cards:"+deckId),c=cards.find(x=>x.id===cardId);if(!c)return;
+ editCardId={deckId,cardId};$("#editFront").value=c.front;$("#editBack").value=c.back;$("#editTags").value=(c.tags||[]).join(" ");$("#editModal").classList.add("open")
+}
+async function saveEdit(){
+ if(!editCardId)return;let cards=await get("cards:"+editCardId.deckId),i=cards.findIndex(x=>x.id===editCardId.cardId);if(i<0)return;
+ cards[i].front=$("#editFront").value.trim();cards[i].back=$("#editBack").value.trim();cards[i].tags=$("#editTags").value.trim().split(/\s+/).filter(Boolean);
+ await set("cards:"+editCardId.deckId,cards);$("#editModal").classList.remove("open");showBrowser($("#cardSearch").value);toast("کارت ذخیره شد ✓")
+}
+async function showStats(){
+ let libs=await library(),hist=[];libs.forEach(d=>(d.history||[]).forEach(x=>hist.push(x)));
+ let total=hist.length,good=hist.filter(x=>x.rating==="good"||x.rating==="easy").length,acc=total?Math.round(good/total*100):0;
+ let days=[];for(let i=6;i>=0;i--){let dt=new Date(Date.now()-i*DAY),k=dt.toISOString().slice(0,10),n=hist.filter(x=>new Date(x.at).toISOString().slice(0,10)===k).length;days.push({k,n})}
+ let max=Math.max(1,...days.map(x=>x.n));
+ $("#statsContent").innerHTML=`<div class="todayGrid"><div class="todayStat"><strong>${fa(total)}</strong>کل مرورها</div><div class="todayStat"><strong>${fa(acc)}٪</strong>موفق</div><div class="todayStat"><strong>${fa(calcStreak(libs))}</strong>Streak</div><div class="todayStat"><strong>${fa(days.reduce((a,b)=>a+b.n,0))}</strong>۷ روز</div></div><div class="chartBar">${days.map(x=>`<div class="chartCol" style="height:${Math.max(2,x.n/max*100)}%"><span>${fa(x.n)}</span></div>`).join("")}</div><p class="sub">نمودار مرورهای ۷ روز اخیر</p>`
+}
+async function exportBackup(){
+ let libs=await library(),payload={version:1,created:Date.now(),library:libs,settings:await appSettings(),decks:{}};
+ for(let d of libs){
+  let blob=await get("blob:"+d.id),cards=await get("cards:"+d.id),media=await get("media:"+d.id);
+  let b64=null;if(blob){let ab=await blob.arrayBuffer();let u=new Uint8Array(ab),s="";for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode(...u.subarray(i,i+0x8000));b64=btoa(s)}
+  payload.decks[d.id]={blob:b64,blobType:blob?.type||"application/octet-stream",cards,media}
+ }
+ let out=new Blob([JSON.stringify(payload)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(out);a.download="samaneh-flashcards-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)
+}
+async function restoreBackup(file){
+ let data=JSON.parse(await file.text());if(!data.library||!data.decks)throw Error("Backup نامعتبر است");
+ await saveLibrary(data.library);await set("settings",data.settings||{});
+ for(let d of data.library){let x=data.decks[d.id]||{};if(x.cards)await set("cards:"+d.id,x.cards);if(x.media)await set("media:"+d.id,x.media);if(x.blob){let bin=atob(x.blob),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);await set("blob:"+d.id,new Blob([u],{type:x.blobType||"application/octet-stream"}))}}
+ await migrateAll();await renderLibrary();await dashboard()
+}
+async function loadSettingsUI(){let s=await appSettings();$("#dailyNew").value=s.dailyNew;$("#dailyReview").value=s.dailyReview;$("#retention").value=Math.round(s.retention*100)}
+async function saveSettingsUI(){let s={dailyNew:+$("#dailyNew").value||20,dailyReview:+$("#dailyReview").value||200,retention:(+$("#retention").value||90)/100};await set("settings",s);$("#settingsModal").classList.remove("open");toast("تنظیمات ذخیره شد ✓")}
+
+// Wrap existing mark() so history is durable without changing old progress.
+const _completeOldMark=mark;
+mark=async function(rating){
+ let deckId=current?.id,cardId=filtered[idx]?.id,at=Date.now();
+ await _completeOldMark(rating);
+ if(deckId&&cardId){let libs=await library(),i=libs.findIndex(d=>d.id===deckId);if(i>=0){libs[i].history=libs[i].history||[];libs[i].history.push({cardId,rating,at});await saveLibrary(libs)}}
+ dashboard()
+};
+
+$("#todayBtn").onclick=openToday;
+$("#browseBtn").onclick=()=>{$("#browseModal").classList.add("open");showBrowser()};
+$("#cardSearch").oninput=e=>showBrowser(e.target.value);
+$("#statsBtn").onclick=async()=>{$("#statsModal").classList.add("open");await showStats()};
+$("#settingsBtn").onclick=async()=>{$("#settingsModal").classList.add("open");await loadSettingsUI()};
+$("#backupBtn").onclick=()=>$("#backupModal").classList.add("open");
+$("#saveSettings").onclick=saveSettingsUI;$("#saveCardEdit").onclick=saveEdit;$("#exportBackup").onclick=exportBackup;
+$("#restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{$("#backupStatus").textContent="در حال بازیابی…";await restoreBackup(f);$("#backupStatus").textContent="بازیابی کامل شد ✓"}catch(err){$("#backupStatus").textContent="خطا: "+err.message}e.target.value=""};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).classList.remove("open"));
+
+const _oldBack=$("#back").onclick;
+$("#back").onclick=async()=>{studyQueueMode=null;$("#studyModeLabel").textContent="";await _oldBack();dashboard()};
+
+(async()=>{await migrateAll();await dashboard()})();
+
 renderLibrary();
 </script>
 </body>
