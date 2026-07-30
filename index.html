@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Progress Vault 3.0 — clickable review category filters */
+/* Progress Vault 3.1 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Progress Vault 3.0 — library ordering */
+/* Progress Vault 3.1 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -185,7 +185,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
 
-/* Progress Vault 3.0 */
+/* Progress Vault 3.1 */
 #cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
 .cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
 .cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
@@ -202,7 +202,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
 
 
-/* Progress Vault 3.0 — global card status */
+/* Progress Vault 3.1 — global card status */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;position:sticky;top:0;background:#111a2e;padding:2px 0 8px;z-index:2}
 .statusTab{border:1px solid #334563;background:#202c47;color:#fff;border-radius:12px;padding:10px 4px;font:inherit;font-size:12px;font-weight:800}
 .statusTab b{display:block;margin-top:4px;color:#aab8d5;font-size:11px}.statusTab.active{background:#ffc300;color:#111827;border-color:#ffc300}.statusTab.active b{color:#111827}
@@ -215,7 +215,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 @media(max-width:390px){.statusTabs{gap:4px}.statusTab{font-size:10px;padding:8px 2px}}
 
 
-/* Progress Vault 3.0 — interaction + progress fixes */
+/* Progress Vault 3.1 — interaction + progress fixes */
 .todayStat.dashboardFilter{cursor:pointer;border:1px solid transparent;transition:transform .12s ease,border-color .12s ease,background .12s ease;user-select:none;-webkit-user-select:none}
 .todayStat.dashboardFilter:active{transform:scale(.975);border-color:#fbbf24;background:#263654}
 .todayStat.dashboardFilter::after{content:"مشاهده";display:block;font-size:8px;color:#7183a4;margin-top:3px}
@@ -237,7 +237,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Progress Vault 3.0</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Progress Vault 3.1</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -676,7 +676,13 @@ async function openDeck(id){
  $("#lessonSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+ids.map(x=>`<option value="${x}">${shortName(current.decks[x])}</option>`).join("");
  $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();await persistSeenIfNeeded(filtered[idx]);render()
 }
-function apply(){let v=$("#lessonSelect").value;if(v==="__today__"&&studyQueueMode==="today")return;filtered=v==="all"?current.cards:current.cards.filter(c=>String(c.did)===String(v));idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
+function apply(){
+ let v=$("#lessonSelect").value;
+ if(v==="__today__"&&studyQueueMode==="today")return;
+ if(v==="__status__"&&studyQueueMode==="status")return;
+ filtered=v==="all"?current.cards:current.cards.filter(c=>String(c.did)===String(v));
+ idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))
+}
 async function persist(){
  let libs=await library(),i=libs.findIndex(x=>x.id===current.id);
  if(i>=0){
@@ -739,6 +745,30 @@ async function mark(s){
  let diff=Math.max(1,Math.min(10,(o.difficulty||5)+(s==="again"?1:s==="hard"?.4:s==="easy"?-.5:-.15)));
  current.srs[id]={reps:(o.reps||0)+1,interval:t[s],stability:t[s],difficulty:diff,due:now+t[s],ease:ease,last:s,lastReviewed:now};
  current.history.push({cardId:id,rating:s,at:now,deckId:c.did});
+
+ if(studyQueueMode==="status"&&statusStudyFilter){
+   const originalFilter=statusStudyFilter;
+   await persist();
+   const refreshed=(current.cards||[])
+     .filter(x=>latestRating(current,x)===originalFilter)
+     .sort((a,b)=>((current.srs||{})[b.id]?.lastReviewed||0)-((current.srs||{})[a.id]?.lastReviewed||0));
+
+   if(!refreshed.length){
+     toast(`همه کارت‌های «${REVIEW_LABELS[originalFilter]}» بررسی شدند ✓`);
+     document.body.classList.remove("studying");$("#studyView").style.display="none";$("#libraryView").style.display="block";
+     current=null;studyQueueMode=null;statusStudyFilter=null;$("#studyModeLabel").textContent="";
+     await renderLibrary();await dashboard();return
+   }
+
+   filtered=refreshed;
+   idx=Math.min(idx,filtered.length-1);
+   current.positions["__status__:"+originalFilter]=idx;
+   render();
+   $("#answer").style.display="block";$("#show").style.display="none";$("#review4").style.display="grid";
+   renderAudio(filtered[idx],"back");
+   await dashboard();
+   return
+ }
 
  if(studyQueueMode==="today"){
    let session=await getTodaySession();
@@ -804,8 +834,13 @@ $("#back").onclick=async()=>{
 $("#lessonSelect").onchange=async()=>{
  const v=$("#lessonSelect").value;
  current.selected=v;
- if(v==="__today__"&&studyQueueMode==="today"){idx=Math.min(current.positions.__today__||0,Math.max(0,filtered.length-1))}
- else{studyQueueMode=null;$("#studyModeLabel").textContent="";apply()}
+ if(v==="__today__"&&studyQueueMode==="today"){
+   idx=Math.min(current.positions.__today__||0,Math.max(0,filtered.length-1))
+ }else if(v==="__status__"&&studyQueueMode==="status"){
+   idx=Math.min(current.positions["__status__:"+statusStudyFilter]||0,Math.max(0,filtered.length-1))
+ }else{
+   studyQueueMode=null;statusStudyFilter=null;$("#studyModeLabel").textContent="";apply()
+ }
  noteSeen(filtered[idx]);await persist();render()
 };
 
@@ -813,7 +848,8 @@ async function browseCard(delta){
  if(!filtered.length)return;
  idx=(idx+delta+filtered.length)%filtered.length;
  let v=$("#lessonSelect").value;
- current.positions[v]=idx;
+ const posKey=(studyQueueMode==="status"&&statusStudyFilter)?("__status__:"+statusStudyFilter):v;
+ current.positions[posKey]=idx;
  noteSeen(filtered[idx]);
  if(studyQueueMode==="today"){
    let session=await getTodaySession();
@@ -898,7 +934,7 @@ $("#again").onclick=()=>mark("again");$("#hard").onclick=()=>mark("hard");$("#go
 
 // Complete 1.0 migration + study engine. Existing IndexedDB keys are preserved.
 const DAY=86400000;
-let studyQueueMode=null, editCardId=null;
+let studyQueueMode=null, statusStudyFilter=null, editCardId=null;
 
 async function appSettings(){
  return Object.assign({dailyNew:20,dailyReview:200,retention:.90},(await get("settings"))||{})
@@ -1204,6 +1240,43 @@ async function globalStatusCounts(){
  }
  return counts
 }
+
+async function openStatusStudy(collectionId,filter,startCardId){
+ document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"));
+ await openDeck(collectionId);
+ if(!current)return;
+
+ const statusCards=(current.cards||[])
+   .filter(c=>latestRating(current,c)===filter)
+   .sort((a,b)=>((current.srs||{})[b.id]?.lastReviewed||0)-((current.srs||{})[a.id]?.lastReviewed||0));
+
+ if(!statusCards.length){toast("دیگر کارتی در این وضعیت نیست");return}
+
+ let opt=[...$("#lessonSelect").options].find(o=>o.value==="__status__");
+ if(!opt){
+   opt=document.createElement("option");
+   opt.value="__status__";
+   $("#lessonSelect").prepend(opt)
+ }
+ opt.textContent=`کارت‌های ${REVIEW_LABELS[filter]||filter}`;
+ $("#lessonSelect").value="__status__";
+ current.selected="__status__";
+ filtered=statusCards;
+ idx=statusCards.findIndex(c=>String(c.id)===String(startCardId));
+ if(idx<0)idx=0;
+ studyQueueMode="status";
+ statusStudyFilter=filter;
+ $("#studyModeLabel").textContent=`• ${REVIEW_LABELS[filter]||filter}`;
+ current.positions["__status__:"+filter]=idx;
+ noteSeen(filtered[idx]);
+ await persist();
+ render();
+ $("#answer").style.display="block";
+ $("#show").style.display="none";
+ $("#review4").style.display="grid";
+ renderAudio(filtered[idx],"back")
+}
+
 async function openExactCard(collectionId,cardId,deckId,showAnswer=true){
  // Close overlays first, then use the normal study screen so audio/swipe/SRS stay identical.
  document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"));
@@ -1241,9 +1314,9 @@ async function renderGlobalStatus(filter=globalStatusFilter){
      list.sort((a,b)=>((d.srs||{})[b.id]?.lastReviewed||0)-((d.srs||{})[a.id]?.lastReviewed||0)).forEach(c=>{
        const s=(d.srs||{})[c.id]||{},row=document.createElement("div");row.className="statusCard";
        const when=s.lastReviewed?new Date(s.lastReviewed).toLocaleString("fa-IR"):"";
-       row.innerHTML=`<div class="statusCardFront">${escapeHtml(c.front)}</div><div class="statusCardBack">${escapeHtml(c.back)}</div><div class="statusCardMeta">${escapeHtml(REVIEW_LABELS[filter]||filter)}${when?" · "+escapeHtml(when):""}</div><div class="statusCardHint">برای باز کردن و تغییر وضعیت لمس کن</div>`;
+       row.innerHTML=`<div class="statusCardFront">${escapeHtml(c.front)}</div><div class="statusCardBack">${escapeHtml(c.back)}</div><div class="statusCardMeta">${escapeHtml(REVIEW_LABELS[filter]||filter)}${when?" · "+escapeHtml(when):""}</div><div class="statusCardHint">برای مرور همه کارت‌های این وضعیت لمس کن</div>`;
        row.setAttribute("role","button");row.tabIndex=0;
-       const open=()=>openExactCard(d.id,c.id,c.did,true);
+       const open=()=>openStatusStudy(d.id,filter,c.id);
        row.addEventListener("click",open);row.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
        box.appendChild(row)
      });
@@ -1352,13 +1425,13 @@ async function openReviewCategory(filter){
 document.querySelectorAll(".reviewFilter").forEach(b=>b.onclick=()=>openReviewCategory(b.dataset.filter));
 
 const _oldBack=$("#back").onclick;
-$("#back").onclick=async()=>{await _oldBack();studyQueueMode=null;$("#studyModeLabel").textContent="";await dashboard()};
+$("#back").onclick=async()=>{await _oldBack();studyQueueMode=null;statusStudyFilter=null;$("#studyModeLabel").textContent="";await dashboard()};
 
 (async()=>{await migrateAll();await dashboard()})();
 
 
 // ============================================================
-// Progress Vault 3.0 — Local-first snapshot sync
+// Progress Vault 3.1 — Local-first snapshot sync
 // ============================================================
 
 function withTimeout(promise,ms=15000,label="عملیات شبکه"){
