@@ -160,7 +160,7 @@ body.studying .row .btn{
 @media(max-width:390px){.todayGrid{gap:4px}.todayStat strong{font-size:14px}.toolBtn{padding:8px 9px}}
 
 
-/* Cloud Sync 2.5.1 — clickable review category filters */
+/* Progress Vault 3.0 — clickable review category filters */
 button.pill{border:1px solid transparent;font:inherit;cursor:pointer}
 button.pill:active{transform:scale(.98)}
 button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;background:#25324d}
@@ -175,7 +175,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .todayRemaining{text-align:center;color:#9fb0cd;font-size:10px;margin-top:7px}
 
 
-/* Cloud Sync 2.5.1 — library ordering */
+/* Progress Vault 3.0 — library ordering */
 .librarySortRow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
 .librarySortRow select{width:auto;min-width:180px;margin:0;padding:8px 10px;font-size:12px}
 .dragHandle{position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:10px;border:1px solid #344563;background:#202c47;color:#cdd7e8;display:grid;place-items:center;font-size:18px;cursor:grab;touch-action:none;z-index:2}
@@ -185,7 +185,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .deckCard{transition:transform .12s ease,opacity .12s ease}
 
 
-/* Cloud Sync 2.5.1 */
+/* Progress Vault 3.0 */
 #cloudBar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:0 0 10px;flex-wrap:wrap}
 .cloudChip{display:inline-flex;align-items:center;gap:5px;border:1px solid #334563;background:#18243d;color:#cbd5e1;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
 .cloudChip.syncing{color:#fbbf24}.cloudChip.ok{color:#86efac}.cloudChip.err{color:#fda4af}
@@ -202,7 +202,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 .syncInfo{background:#18243d;border:1px solid #2b3b59;border-radius:13px;padding:11px;font-size:11px;color:#aab8d5;line-height:1.8;margin-bottom:9px}
 
 
-/* Cloud Sync 2.5.1 — global card status */
+/* Progress Vault 3.0 — global card status */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;position:sticky;top:0;background:#111a2e;padding:2px 0 8px;z-index:2}
 .statusTab{border:1px solid #334563;background:#202c47;color:#fff;border-radius:12px;padding:10px 4px;font:inherit;font-size:12px;font-weight:800}
 .statusTab b{display:block;margin-top:4px;color:#aab8d5;font-size:11px}.statusTab.active{background:#ffc300;color:#111827;border-color:#ffc300}.statusTab.active b{color:#111827}
@@ -215,7 +215,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 @media(max-width:390px){.statusTabs{gap:4px}.statusTab{font-size:10px;padding:8px 2px}}
 
 
-/* Cloud Sync 2.5.1 — interaction + progress fixes */
+/* Progress Vault 3.0 — interaction + progress fixes */
 .todayStat.dashboardFilter{cursor:pointer;border:1px solid transparent;transition:transform .12s ease,border-color .12s ease,background .12s ease;user-select:none;-webkit-user-select:none}
 .todayStat.dashboardFilter:active{transform:scale(.975);border-color:#fbbf24;background:#263654}
 .todayStat.dashboardFilter::after{content:"مشاهده";display:block;font-size:8px;color:#7183a4;margin-top:3px}
@@ -237,7 +237,7 @@ button.pill.active{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;backg
 <body>
 <div class="wrap">
 <header>
- <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Cloud Sync 2.5.1</div></div>
+ <div><h1>فلش‌کارت‌های سمانه 🌸</h1><div class="sub">کتابخانه شخصی · Progress Vault 3.0</div></div>
  <label class="btn primary" for="file">＋ افزودن APKG</label>
  <input id="file" type="file">
 </header>
@@ -389,7 +389,17 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
 });
 let cloudUser=null, cloudSyncing=false, cloudPulling=false, cloudTimer=null, realtimeChannel=null;
 
-const clean=s=>(s||"").replace(/\[sound:[^\]]+\]/g,"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").trim();
+function decodeHtmlEntities(value){
+ const el=document.createElement("textarea");
+ el.innerHTML=String(value||"");
+ return el.value
+}
+const clean=s=>decodeHtmlEntities(
+ String(s||"")
+   .replace(/\[sound:[^\]]+\]/g,"")
+   .replace(/<br\s*\/?>/gi,"\n")
+   .replace(/<[^>]+>/g,"")
+).replace(/\u00a0/g," ").trim();
 const sounds=s=>[...(s||"").matchAll(/\[sound:([^\]]+)\]/g)].map(x=>x[1]);
 const zstd=u=>u&&u[0]===0x28&&u[1]===0xB5&&u[2]===0x2F&&u[3]===0xFD?window.fzstd.decompress(u):u;
 function rv(b,p){let v=0,s=0,x;do{x=b[p++];v+=(x&127)*2**s;s+=7}while(x&128);return[v,p]}
@@ -405,7 +415,115 @@ async function get(k){let d=await odb();return new Promise((ok,no)=>{let r=d.tra
 async function set(k,v){let d=await odb();return new Promise((ok,no)=>{let x=d.transaction(STORE,"readwrite");x.objectStore(STORE).put(v,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}
 async function del(k){let d=await odb();return new Promise((ok,no)=>{let x=d.transaction(STORE,"readwrite");x.objectStore(STORE).delete(k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}
 async function library(){return(await get("library"))||[]}
+
 async function saveLibrary(x){await set("library",x)}
+
+function fastStableHash(text){
+ let h1=0x811c9dc5;
+ for(let i=0;i<text.length;i++){
+   h1^=text.charCodeAt(i);
+   h1=Math.imul(h1,0x01000193)
+ }
+ return (h1>>>0).toString(36)
+}
+function stableCollectionKey(cards,decks={},title=""){
+ const ids=(cards||[]).map(c=>String(c.id)).sort();
+ // Exact same APKG always receives the same identity on every device,
+ // even when the local library record has a different random id.
+ return "apkg_"+fastStableHash(ids.join("|"))
+}
+function emptyProgressVault(){return{schema:1,cards:{},history:[],collections:{},updatedAt:0}}
+async function getProgressVault(){
+ const raw=await get("progressVault");
+ return raw&&raw.cards?raw:emptyProgressVault()
+}
+async function saveProgressVault(v){
+ v.schema=1;v.updatedAt=Date.now();await set("progressVault",v)
+}
+function mergeHistoryEvents(a=[],b=[]){
+ const map=new Map();
+ for(const x of [...a,...b]){
+   if(!x||x.cardId==null||!x.at)continue;
+   const key=`${x.cardId}|${x.rating||""}|${x.at}`;
+   if(!map.has(key))map.set(key,x)
+ }
+ return [...map.values()].sort((x,y)=>(x.at||0)-(y.at||0))
+}
+function newerCardProgress(a,b){
+ if(!a)return b;if(!b)return a;
+ const ta=Math.max(a.updatedAt||0,a.srs?.lastReviewed||0,a.seenAt||0);
+ const tb=Math.max(b.updatedAt||0,b.srs?.lastReviewed||0,b.seenAt||0);
+ return tb>=ta?b:a
+}
+function mergeProgressVaults(local,remote){
+ local=local&&local.cards?local:emptyProgressVault();
+ remote=remote&&remote.cards?remote:emptyProgressVault();
+ const out=emptyProgressVault();
+ const keys=new Set([...Object.keys(local.cards||{}),...Object.keys(remote.cards||{})]);
+ keys.forEach(k=>out.cards[k]=newerCardProgress(local.cards[k],remote.cards[k]));
+ out.history=mergeHistoryEvents(local.history,remote.history);
+ out.collections={...(local.collections||{}),...(remote.collections||{})};
+ out.updatedAt=Math.max(local.updatedAt||0,remote.updatedAt||0,Date.now());
+ return out
+}
+async function archiveCollectionProgress(d){
+ if(!d)return;
+ const cards=(await get("cards:"+d.id))||[];
+ if(!d.stableKey)d.stableKey=stableCollectionKey(cards,d.decks,d.title);
+ const vault=await getProgressVault();
+ for(const c of cards){
+   const id=String(c.id),s=(d.srs||{})[id]||(d.srs||{})[c.id],rating=(d.review||{})[id]||(d.review||{})[c.id];
+   const seenAt=(d.seen||{})[id]||(d.seen||{})[c.id]||0;
+   const next={
+     cardId:id,collectionKey:d.stableKey,rating:rating||null,
+     srs:s?{...s}:null,seenAt:Number(seenAt)||0,
+     updatedAt:Math.max(Number(s?.lastReviewed)||0,Number(seenAt)||0,Date.now())
+   };
+   vault.cards[id]=newerCardProgress(vault.cards[id],next)
+ }
+ vault.history=mergeHistoryEvents(vault.history,(d.history||[]).map(x=>({...x,collectionKey:d.stableKey,cardId:String(x.cardId)})));
+ vault.collections[d.stableKey]={
+   title:d.title||"",positions:{...(d.positions||{})},selected:d.selected||"all",
+   manualOrder:d.manualOrder||0,updatedAt:Date.now()
+ };
+ await saveProgressVault(vault)
+}
+async function restoreCollectionProgress(d,cards){
+ if(!d||!cards)return d;
+ if(!d.stableKey)d.stableKey=stableCollectionKey(cards,d.decks,d.title);
+ const vault=await getProgressVault();
+ d.review=d.review||{};d.srs=d.srs||{};d.seen=d.seen||{};d.history=d.history||[];
+ const cardIds=new Set(cards.map(c=>String(c.id)));
+ for(const c of cards){
+   const p=vault.cards[String(c.id)];if(!p)continue;
+   if(p.rating)d.review[c.id]=p.rating;
+   if(p.srs)d.srs[c.id]={...p.srs};
+   if(p.seenAt)d.seen[c.id]=p.seenAt
+ }
+ d.history=mergeHistoryEvents(
+   d.history,
+   (vault.history||[]).filter(x=>cardIds.has(String(x.cardId))).map(x=>({...x,cardId:String(x.cardId)}))
+ );
+ const cv=vault.collections?.[d.stableKey];
+ if(cv){
+   d.positions={...(cv.positions||d.positions||{all:0})};
+   d.selected=cv.selected||d.selected||"all"
+ }
+ return d
+}
+async function applyVaultToLocalLibraries(){
+ let libs=await library(),changed=false;
+ for(const d of libs){
+   const cards=(await get("cards:"+d.id))||[];
+   const before=JSON.stringify({r:d.review,s:d.srs,n:d.seen,h:d.history,p:d.positions,sel:d.selected,k:d.stableKey});
+   await restoreCollectionProgress(d,cards);
+   const after=JSON.stringify({r:d.review,s:d.srs,n:d.seen,h:d.history,p:d.positions,sel:d.selected,k:d.stableKey});
+   if(before!==after)changed=true
+ }
+ if(changed)await saveLibrary(libs);
+ return changed
+}
+
 
 async function parseAPKG(file){
  zip=await JSZip.loadAsync(file); mediaMap={};
@@ -424,12 +542,35 @@ function shortName(n){let p=(n||"Deck").split("::");return p[p.length-1]}
 async function importFile(file){
  $("#status").textContent="در حال افزودن به کتابخانه…";
  try{
-  let parsed=await parseAPKG(file), libs=await library();
+  let parsed=await parseAPKG(file),libs=await library();
+  const stableKey=stableCollectionKey(parsed.cards,parsed.decks,file.name);
+  let existing=libs.find(x=>x.stableKey===stableKey);
+
+  if(existing){
+    // Replacing/re-adding the same APKG updates only local assets.
+    // Existing progress stays untouched and is also restored from the permanent vault.
+    await set("blob:"+existing.id,file);
+    await set("cards:"+existing.id,parsed.cards);
+    await set("media:"+existing.id,parsed.mediaMap);
+    existing.fileName=file.name;existing.total=parsed.cards.length;existing.decks=parsed.decks;
+    await restoreCollectionProgress(existing,parsed.cards);
+    await saveLibrary(libs);await archiveCollectionProgress(existing);
+    $("#status").textContent="";await renderLibrary();await dashboard();
+    toast("فایل محلی به‌روزرسانی شد؛ پیشرفت حفظ شد ✓");scheduleCloudSync();return
+  }
+
   let id="d_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
   let title=file.name.replace(/\.(apkg|colpkg)$/i,"").replace(/\(\+?audio\)/ig,"").trim();
-  let item={id,title,fileName:file.name,total:parsed.cards.length,created:Date.now(),localUpdatedAt:Date.now(),manualOrder:libs.length,review:{},srs:{},positions:{all:0},selected:"all",decks:parsed.decks};
-  await set("blob:"+id,file); await set("cards:"+id,parsed.cards); await set("media:"+id,parsed.mediaMap);
-  libs.unshift(item);await saveLibrary(libs);await markLocalDirty();scheduleCloudSync();$("#status").textContent="";await renderLibrary();toast("به کتابخانه اضافه شد ✓");
+  let item={
+    id,stableKey,title,fileName:file.name,total:parsed.cards.length,created:Date.now(),
+    localUpdatedAt:Date.now(),manualOrder:libs.length,review:{},srs:{},seen:{},
+    history:[],positions:{all:0},selected:"all",decks:parsed.decks
+  };
+  await restoreCollectionProgress(item,parsed.cards);
+  await set("blob:"+id,file);await set("cards:"+id,parsed.cards);await set("media:"+id,parsed.mediaMap);
+  libs.unshift(item);await saveLibrary(libs);await archiveCollectionProgress(item);
+  await markLocalDirty();scheduleCloudSync();$("#status").textContent="";
+  await renderLibrary();await dashboard();toast("به کتابخانه اضافه شد؛ پیشرفت قبلی بازیابی شد ✓")
  }catch(e){console.error(e);$("#status").textContent="خطا: "+e.message}
 }
 async function renderLibrary(){
@@ -459,10 +600,12 @@ async function renderLibrary(){
   el.onclick=e=>{if(!e.target.closest(".dragHandle")&&!e.target.closest(".remove"))openDeck(d.id)};
   el.querySelector(".remove").onclick=async e=>{
     e.stopPropagation();
-    if(confirm(`«${d.title}» از کتابخانه حذف شود؟`)){
+    if(confirm(`«${d.title}» فقط از این دستگاه حذف شود؟ پیشرفت محفوظ می‌ماند.`)){
+      await archiveCollectionProgress(d);
       let a=await library();a=a.filter(x=>x.id!==d.id);
       await saveLibrary(a);await del("blob:"+d.id);await del("cards:"+d.id);await del("media:"+d.id);
-      await markLocalDirty();scheduleCloudSync();await renderLibrary();await dashboard()
+      await markLocalDirty();scheduleCloudSync();await renderLibrary();await dashboard();
+      toast("APKG از این دستگاه حذف شد؛ پیشرفت محفوظ است ✓")
     }
   };
 
@@ -523,18 +666,24 @@ async function persistSeenIfNeeded(card){if(noteSeen(card))await persist()}
 
 async function openDeck(id){
  let libs=await library();current=libs.find(x=>x.id===id);if(!current)return;
- let blob=await get("blob:"+id);current.cards=await get("cards:"+id);mediaMap=await get("media:"+id)||{};zip=await JSZip.loadAsync(blob);
+ current.cards=(await get("cards:"+id))||[];
+ mediaMap=await get("media:"+id)||{};
+ let blob=await get("blob:"+id);zip=null;
+ if(blob){try{zip=await JSZip.loadAsync(blob)}catch(e){console.warn("local APKG",e)}}
+ if(!current.cards.length||!blob){toast("APKG این مجموعه روی این دستگاه موجود نیست؛ دوباره اضافه‌اش کن");current=null;return}
  document.body.classList.add("studying");$("#libraryView").style.display="none";$("#studyView").style.display="flex";$("#studyTitle").textContent=current.title;
  let ids=[...new Set(current.cards.map(c=>c.did))].sort((a,b)=>shortName(current.decks[a]).localeCompare(shortName(current.decks[b]),"fr",{numeric:true}));
  $("#lessonSelect").innerHTML='<option value="all">همه کارت‌ها</option>'+ids.map(x=>`<option value="${x}">${shortName(current.decks[x])}</option>`).join("");
- $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();await persistSeenIfNeeded(filtered[idx]);render();
+ $("#lessonSelect").value=ids.includes(current.selected)?current.selected:"all";apply();await persistSeenIfNeeded(filtered[idx]);render()
 }
 function apply(){let v=$("#lessonSelect").value;if(v==="__today__"&&studyQueueMode==="today")return;filtered=v==="all"?current.cards:current.cards.filter(c=>String(c.did)===String(v));idx=Math.min((current.positions||{})[v]||0,Math.max(0,filtered.length-1))}
 async function persist(){
  let libs=await library(),i=libs.findIndex(x=>x.id===current.id);
- if(i>=0){let keep={...current};delete keep.cards;keep.localUpdatedAt=Date.now();libs[i]=keep;await saveLibrary(libs)}
- await markLocalDirty();
- scheduleCloudSync()
+ if(i>=0){
+   let keep={...current};delete keep.cards;keep.localUpdatedAt=Date.now();libs[i]=keep;await saveLibrary(libs);
+   await archiveCollectionProgress(keep)
+ }
+ await markLocalDirty();scheduleCloudSync()
 }
 function summary(){let n={again:0,hard:0,good:0,easy:0},seen=0;filtered.forEach(c=>{let s=(current.review||{})[c.id];if(n[s]!=null){n[s]++;seen++}});$("#againN").textContent=fa(n.again);$("#hardN").textContent=fa(n.hard);$("#goodN").textContent=fa(n.good);$("#easyN").textContent=fa(n.easy);$("#unseenN").textContent=fa(filtered.length-seen)}
 async function renderAudio(c,side="front"){
@@ -594,7 +743,7 @@ async function mark(s){
  if(studyQueueMode==="today"){
    let session=await getTodaySession();
    if(session){
-     let gi=session.items.findIndex((x,i)=>!session.completed?.[i]&&x.collectionId===current.id&&String(x.cardId)===String(id));
+     let gi=session.items.findIndex((x,i)=>!session.completed?.[i]&&x.collectionKey===(current.stableKey||"")&&String(x.cardId)===String(id));
      if(gi<0)gi=session.index||0;
      session.completed=session.completed||{};session.viewed=session.viewed||{};
      session.completed[gi]={rating:s,at:now};session.viewed[gi]=session.viewed[gi]||now;
@@ -613,7 +762,7 @@ async function mark(s){
      }
 
      const nextItem=session.items[next];
-     if(nextItem.collectionId!==current.id){
+     if(nextItem.collectionKey!==(current.stableKey||"")){
        await openTodaySessionAt(session,next);return
      }
      const nextLocal=filtered.findIndex(x=>String(x.id)===String(nextItem.cardId));
@@ -642,7 +791,7 @@ $("#back").onclick=async()=>{
  if(studyQueueMode==="today"){
    let session=await getTodaySession();
    if(session&&current&&filtered[idx]){
-     const gi=session.items.findIndex((x,i)=>!session.completed?.[i]&&x.collectionId===current.id&&String(x.cardId)===String(filtered[idx].id));
+     const gi=session.items.findIndex((x,i)=>!session.completed?.[i]&&x.collectionKey===(current.stableKey||"")&&String(x.cardId)===String(filtered[idx].id));
      if(gi>=0){
        session.index=gi;session.viewed=session.viewed||{};session.viewed[gi]=session.viewed[gi]||Date.now();
        session.maxReached=Math.max(Number(session.maxReached)||0,gi+1);
@@ -669,7 +818,7 @@ async function browseCard(delta){
  if(studyQueueMode==="today"){
    let session=await getTodaySession();
    if(session){
-     const cardId=String(filtered[idx].id),globalIndex=session.items.findIndex((x,i)=>i>=0&&x.collectionId===current.id&&String(x.cardId)===cardId&&!session.completed?.[i]);
+     const cardId=String(filtered[idx].id),globalIndex=session.items.findIndex((x,i)=>i>=0&&x.collectionKey===(current.stableKey||"")&&String(x.cardId)===cardId&&!session.completed?.[i]);
      if(globalIndex>=0){
        session.index=globalIndex;session.viewed=session.viewed||{};session.viewed[globalIndex]=Date.now();
        session.maxReached=Math.max(Number(session.maxReached)||0,globalIndex+1);
@@ -805,6 +954,9 @@ async function migrateAll(){
    cards.forEach(c=>{
      if(!Array.isArray(c.tags)){c.tags=[];cc=true}
      if(c.suspended==null){c.suspended=false;cc=true}
+     const fixedFront=clean(c.front),fixedBack=clean(c.back);
+     if(fixedFront!==c.front){c.front=fixedFront;cc=true}
+     if(fixedBack!==c.back){c.back=fixedBack;cc=true}
      if((d.review||{})[c.id]&&!d.seen[c.id]){d.seen[c.id]=Date.now();changed=true}
    });
    // Recover old lesson browsing progress from saved positions without resetting anything.
@@ -818,11 +970,15 @@ async function migrateAll(){
    if(cc)await set("cards:"+d.id,cards)
   }
  }
- if(changed){
-   await saveLibrary(libs);
-   // Ensure upgraded card structure is propagated to the other device.
-   try{await markLocalDirty();scheduleCloudSync()}catch(_){}
+ // Give every existing local APKG a deterministic cross-device identity,
+ // then seed the permanent progress vault from all existing data.
+ for(const d of libs){
+   const cards=(await get("cards:"+d.id))||[];
+   if(!d.stableKey){d.stableKey=stableCollectionKey(cards,d.decks,d.title);changed=true}
  }
+ if(changed)await saveLibrary(libs);
+ for(const d of libs)await archiveCollectionProgress(d);
+ try{await markLocalDirty();scheduleCloudSync()}catch(_){}
 }
 function stateOf(d,c,now=Date.now()){
  if(c.suspended)return"suspended";
@@ -871,10 +1027,10 @@ async function buildTodaySession(){
    let cards=sortStudyCards(d,(await get("cards:"+d.id))||[]);
    let due=cards.filter(c=>!c.suspended&&["due","learning"].includes(stateOf(d,c,now))&&((d.srs||{})[c.id]?.due||0)<=now).slice(0,reviewLeft);
    reviewLeft-=due.length;
-   due.forEach(c=>items.push({collectionId:d.id,cardId:String(c.id),kind:"review"}));
+   due.forEach(c=>items.push({collectionKey:d.stableKey||stableCollectionKey(cards,d.decks,d.title),cardId:String(c.id),kind:"review"}));
    let fresh=cards.filter(c=>!c.suspended&&stateOf(d,c,now)==="new").slice(0,newLeft);
    newLeft-=fresh.length;
-   fresh.forEach(c=>items.push({collectionId:d.id,cardId:String(c.id),kind:"new"}));
+   fresh.forEach(c=>items.push({collectionKey:d.stableKey||stableCollectionKey(cards,d.decks,d.title),cardId:String(c.id),kind:"new"}));
    if(reviewLeft<=0&&newLeft<=0)break
  }
  if(!items.length)return null;
@@ -884,13 +1040,18 @@ async function buildTodaySession(){
 async function openTodaySessionAt(session,index){
  if(!session||!session.items?.length)return;
  index=Math.max(0,Math.min(index,session.items.length-1));
- const target=session.items[index],collectionId=target.collectionId;
- const segmentIndexes=[];
- session.items.forEach((x,i)=>{if(x.collectionId===collectionId && !session.completed?.[i])segmentIndexes.push(i)});
+ const libs=await library(),target=session.items[index];
+ const targetDeck=libs.find(d=>(d.stableKey||"")===target.collectionKey);
+ if(!targetDeck){
+   toast("برای ادامه این برنامه، APKG مربوطه را یک‌بار روی این دستگاه اضافه کن");
+   return
+ }
+ const collectionKey=target.collectionKey,segmentIndexes=[];
+ session.items.forEach((x,i)=>{if(x.collectionKey===collectionKey&&!session.completed?.[i])segmentIndexes.push(i)});
  if(!segmentIndexes.length){session.index=index+1;await saveTodaySession(session);return openToday()}
- const firstGlobal=segmentIndexes.find(i=>i>=index) ?? segmentIndexes[0];
+ const firstGlobal=segmentIndexes.find(i=>i>=index)??segmentIndexes[0];
 
- await openDeck(collectionId);
+ await openDeck(targetDeck.id);
  let cardsById=new Map((current.cards||[]).map(c=>[String(c.id),c]));
  filtered=segmentIndexes.map(i=>cardsById.get(String(session.items[i].cardId))).filter(Boolean);
  let localIndex=segmentIndexes.indexOf(firstGlobal);if(localIndex<0)localIndex=0;
@@ -1101,7 +1262,7 @@ async function dashboardCards(kind){
    if(session){
      for(let i=0;i<session.items.length;i++){
        const it=session.items[i];if(it.kind!=="new")continue;
-       const d=libs.find(x=>x.id===it.collectionId);if(!d)continue;
+       const d=libs.find(x=>(x.stableKey||"")===it.collectionKey);if(!d)continue;
        const cards=(await get("cards:"+d.id))||[],c=cards.find(x=>String(x.id)===String(it.cardId));
        if(c)rows.push({d,c,meta:session.completed?.[i]?"انجام‌شده امروز":session.viewed?.[i]?"مشاهده‌شده امروز":"جدید امروز"})
      }
@@ -1197,8 +1358,16 @@ $("#back").onclick=async()=>{await _oldBack();studyQueueMode=null;$("#studyModeL
 
 
 // ============================================================
-// Cloud Sync 2.5.1 — Local-first snapshot sync
+// Progress Vault 3.0 — Local-first snapshot sync
 // ============================================================
+
+function withTimeout(promise,ms=15000,label="عملیات شبکه"){
+ let timer;
+ return Promise.race([
+   promise,
+   new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+" بیش از حد طول کشید")),ms)})
+ ]).finally(()=>clearTimeout(timer))
+}
 function setCloudStatus(text,kind=""){
  const x=$("#cloudChip");if(!x)return;x.className="cloudChip "+kind;x.textContent=text
 }
@@ -1207,82 +1376,46 @@ function scheduleCloudSync(delay=900){
  if(!cloudUser||cloudPulling)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>syncCloud(false),delay)
 }
 async function buildSnapshot(){
- const libs=await library(),collections=[];
- for(const d of libs){
-   collections.push({
-     meta:{...d},
-     cards:(await get("cards:"+d.id))||[],
-     media:(await get("media:"+d.id))||{}
-   })
- }
  return{
-   schema:5,
-   updatedAt:Date.now(),
-   librarySort:(await get("librarySort"))||"import_asc",
+   schema:7,updatedAt:Date.now(),
    settings:await appSettings(),
    todaySession:await getTodaySession(),
-   collections
+   progressVault:await getProgressVault()
  }
-}
-async function ensureApkgInCloud(d){
- const blob=await get("blob:"+d.id);if(!blob||!cloudUser)return null;
- const path=`${cloudUser.id}/${d.id}.apkg`;
- const {error}=await sb.storage.from("flashcard-apkg").upload(path,blob,{upsert:true,contentType:"application/octet-stream"});
- if(error)throw error;
- return path
 }
 async function pushSnapshot(){
- const snap=await buildSnapshot();
- for(const x of snap.collections){
-   try{x.meta.apkgPath=await ensureApkgInCloud(x.meta)}catch(e){console.warn("APKG upload",e)}
- }
- snap.updatedAt=Date.now();
- const {error}=await sb.from("flashcard_settings").upsert({
+ const snap=await buildSnapshot();snap.updatedAt=Date.now();
+ const {error}=await withTimeout(sb.from("flashcard_settings").upsert({
    user_id:cloudUser.id,
    daily_new:snap.settings.dailyNew,
    daily_review:snap.settings.dailyReview,
    desired_retention:snap.settings.retention,
-   library_sort:snap.librarySort,
+   library_sort:(await get("librarySort"))||"import_asc",
    settings:{flash_sync_snapshot:snap}
- },{onConflict:"user_id"});
+ },{onConflict:"user_id"}),20000,"ارسال پیشرفت به Cloud");
  if(error)throw error;
- await set("lastLocalChange",snap.updatedAt);
- await set("lastCloudSync",snap.updatedAt)
+ await set("lastLocalChange",snap.updatedAt);await set("lastCloudSync",snap.updatedAt)
 }
 async function pullSnapshot(){
  if(!cloudUser)return false;
- const {data,error}=await sb.from("flashcard_settings").select("*").eq("user_id",cloudUser.id).maybeSingle();
+ const {data,error}=await withTimeout(
+   sb.from("flashcard_settings").select("*").eq("user_id",cloudUser.id).maybeSingle(),
+   15000,"دریافت پیشرفت از Cloud"
+ );
  if(error)throw error;
- const snap=data?.settings?.flash_sync_snapshot;
- if(!snap)return false;
+ const snap=data?.settings?.flash_sync_snapshot;if(!snap)return false;
 
  cloudPulling=true;
  try{
-   const localChange=(await get("lastLocalChange"))||0;
-   if(localChange>Number(snap.updatedAt||0))return false;
-
-   const libs=[];
-   for(const x of (snap.collections||[])){
-     const d={...x.meta};delete d.apkgPath;
-     libs.push(d);
-     await set("cards:"+d.id,x.cards||[]);
-     await set("media:"+d.id,x.media||{});
-
-     // Download APKG only when this device does not already have it.
-     const existing=await get("blob:"+d.id);
-     if(!existing && x.meta?.apkgPath){
-       const {data:blob,error:de}=await sb.storage.from("flashcard-apkg").download(x.meta.apkgPath);
-       if(!de&&blob)await set("blob:"+d.id,blob)
-     }
-   }
-   await saveLibrary(libs);
-   await set("librarySort",snap.librarySort||"import_asc");
-   await set("settings",snap.settings||{dailyNew:20,dailyReview:200,retention:.90});
+   const localVault=await getProgressVault();
+   const merged=mergeProgressVaults(localVault,snap.progressVault||emptyProgressVault());
+   await saveProgressVault(merged);
+   await set("settings",snap.settings||await appSettings());
    if(snap.todaySession&&snap.todaySession.date===todayKey())await set("todaySession",snap.todaySession);
-   else await del("todaySession");
+   await applyVaultToLocalLibraries();
    await set("lastLocalChange",Number(snap.updatedAt)||Date.now());
    await set("lastCloudSync",Number(snap.updatedAt)||Date.now());
-   await migrateAll();await renderLibrary();await dashboard();
+   await renderLibrary();await dashboard();
    return true
  } finally {cloudPulling=false}
 }
@@ -1326,7 +1459,7 @@ function startRealtime(){
  realtimeChannel=sb.channel("tulipa-flash-sync")
    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"flashcard_settings",filter:`user_id=eq.${cloudUser.id}`},async()=>{
       if(cloudSyncing||cloudPulling)return;
-      try{setCloudStatus("☁️ دریافت تغییرات…","syncing");await pullSnapshot();setCloudStatus("☁️ همگام شد ✓","ok")}catch(e){console.error(e)}
+      try{setCloudStatus("☁️ دریافت تغییرات…","syncing");await pullSnapshot();setCloudStatus("☁️ همگام شد ✓","ok")}catch(e){console.error(e);setCloudStatus("☁️ خطای Sync؛ برنامه آفلاین فعال است","err")}
    }).subscribe()
 }
 async function handleSession(session){
@@ -1336,8 +1469,10 @@ async function handleSession(session){
    return
  }
  $("#loginGate").classList.remove("open");
- $("#accountInfo").textContent="حساب Tulipa فعال است. ورود روی این دستگاه ذخیره شده و اطلاعات با دستگاه‌های دیگر Sync می‌شود.";
- startRealtime();await syncCloud(false)
+ $("#accountInfo").textContent="حساب Tulipa فعال است. فقط پیشرفت و تنظیمات Sync می‌شوند؛ APKG روی هر دستگاه محلی می‌ماند.";
+ startRealtime();
+ // Important: network/sync errors must never block clicks or navigation.
+ syncCloud(false).catch(e=>console.error("background sync",e))
 }
 $("#loginBtn").onclick=async()=>{
  const password=$("#loginPassword").value;
